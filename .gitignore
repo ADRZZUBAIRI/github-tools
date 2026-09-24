@@ -4,4 +4,7 @@ cloudflared.exe
 __pycache__/
 *.pyc
 .env
+build/
+dist/
+*.egg-info/
 ADRZZUBAIRI/

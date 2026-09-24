@@ -350,5 +350,13 @@ def run_scale_scraper(cities=None, max_per_city=35, output_csv="c:/WebSmitherz/g
     print(f"    - Emails Captured: {with_email}/{len(all_leads)} ({with_email/max(1,len(all_leads))*100:.1f}%)")
     print(f"=======================================================\n")
 
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="WebSmitherz Free Google Maps Contractor Lead Scraper")
+    parser.add_argument("--count", type=int, default=20, help="Max leads to scrape per city")
+    parser.add_argument("--output", type=str, default="contractor_leads_export.csv", help="Output CSV path")
+    args = parser.parse_args()
+    run_scale_scraper(max_per_city=args.count, output_csv=args.output)
+
 if __name__ == "__main__":
-    run_scale_scraper(max_per_city=30)
+    main()
