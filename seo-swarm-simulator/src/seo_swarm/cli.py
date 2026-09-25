@@ -1,7 +1,7 @@
 """
-CLI Entry Point & Brutal Orchestrator for SEO Swarm Simulator
-============================================================
-Runs the ruthless 8-persona adversarial reality pipeline.
+CLI Entry Point & Brutal Orchestrator for SEO Swarm Simulator (12-Persona Suite)
+=================================================================================
+Runs the ruthless 12-persona adversarial reality pipeline.
 """
 
 import os
@@ -13,12 +13,16 @@ from typing import Dict, Any
 from seo_swarm.store.database import init_db, store_run, store_evidence, store_evaluation
 from seo_swarm.roles.roster import (
     SERPExecutionerRole,
+    NavBoostClickstreamCriticRole,
+    AIOverviewInterceptorRole,
     BacklinkDebtCollectorRole,
     InformationGainTribunalRole,
-    SkepticalBlueCollarCFORole,
+    InternalLinkMeshAuditorRole,
+    SchemaKnowledgeGraphProsecutorRole,
     CoreWebVitalsTerminatorRole,
-    SchemaEntityProsecutorRole,
-    CompetitorPredatorRole,
+    SkepticalBlueCollarCFORole,
+    B2BOperationsBuyerRole,
+    VCCompetitorPredatorRole,
     AdversarialRefereeRole
 )
 
@@ -27,7 +31,7 @@ def run_swarm_audit(target_file_path: str):
         print(f"[!] Error: Target file '{target_file_path}' does not exist.")
         return
 
-    with open(target_file_path, "r", encoding="utf-8") as f:
+    with open(target_file_path, "r", encoding="utf-8", errors="ignore") as f:
         html_content = f.read()
 
     title_m = re.search(r'\$page_title\s*=\s*["\']([^"\']+)["\']|<title>([^<]+)</title>', html_content, re.IGNORECASE)
@@ -45,7 +49,7 @@ def run_swarm_audit(target_file_path: str):
 
     run_id = f"RUN-{uuid.uuid4().hex[:8].upper()}"
     conn = init_db()
-    store_run(conn, run_id, target_file_path, "brutal_depression_mode")
+    store_run(conn, run_id, target_file_path, "brutal_12_persona_mode")
 
     evidence_map = {
         "EVD-TITLE": title,
@@ -58,22 +62,26 @@ def run_swarm_audit(target_file_path: str):
 
     analyst_roles = [
         SERPExecutionerRole(),
+        NavBoostClickstreamCriticRole(),
+        AIOverviewInterceptorRole(),
         BacklinkDebtCollectorRole(),
         InformationGainTribunalRole(),
-        SkepticalBlueCollarCFORole(),
+        InternalLinkMeshAuditorRole(),
+        SchemaKnowledgeGraphProsecutorRole(),
         CoreWebVitalsTerminatorRole(),
-        SchemaEntityProsecutorRole(),
-        CompetitorPredatorRole()
+        SkepticalBlueCollarCFORole(),
+        B2BOperationsBuyerRole(),
+        VCCompetitorPredatorRole()
     ]
 
     evaluations = []
-    print("\n" + "#" * 80)
-    print(" " * 18 + "BRUTAL ADVERSARIAL SEO SWARM: REALITY AUDIT")
+    print("\n" + "#" * 84)
+    print(" " * 18 + "BRUTAL ADVERSARIAL SEO SWARM: 12-PERSONA AUDIT")
     print(" " * 22 + "(The Depressing Truth About Your SERP Rankings)")
-    print("#" * 80)
-    print(f" Target Target : {target_file_path}")
-    print(f" Run ID        : {run_id} | Mode: Full Reality Execution")
-    print("#" * 80 + "\n")
+    print("#" * 84)
+    print(f" Target File  : {target_file_path}")
+    print(f" Run ID       : {run_id} | Mode: 12-Persona Reality Execution")
+    print("#" * 84 + "\n")
 
     for role in analyst_roles:
         res = role.evaluate(page_data, evidence_map)
@@ -90,9 +98,9 @@ def run_swarm_audit(target_file_path: str):
     referee = AdversarialRefereeRole()
     final_verdict = referee.evaluate_swarm(evaluations)
     
-    print("=" * 80)
+    print("=" * 84)
     print("                        ADVERSARIAL REALITY CONSENSUS")
-    print("=" * 80)
+    print("=" * 84)
     print(f" Composite Reality Score : {final_verdict['composite_reality_score']} / 100")
     print(f" Depression Index        : {final_verdict['depression_index']}")
     print(f" Algorithmic Verdict     : {final_verdict['consensus']}")
@@ -107,7 +115,7 @@ def run_swarm_audit(target_file_path: str):
         print("\n[+] MANDATORY RESCUE ACTIONS (HOW TO STOP GETTING 0 CLICKS):")
         for r in final_verdict["priority_recommendations"]:
             print(f"   * [{r.get('benefit', 'high').upper()}] {r.get('title')}: {r.get('action')}")
-    print("=" * 80 + "\n")
+    print("=" * 84 + "\n")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
