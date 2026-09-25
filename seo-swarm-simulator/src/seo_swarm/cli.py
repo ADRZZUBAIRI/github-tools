@@ -12,12 +12,12 @@ from typing import Dict, Any
 
 from seo_swarm.store.database import init_db, store_run, store_evidence, store_evaluation
 from seo_swarm.roles.roster import (
-    GSCAnalystRole,
+    SERPDifficultyAnalystRole,
+    OffPageAuthorityCriticRole,
+    InformationGainAuditorRole,
+    SkepticalContractorPersonaRole,
     TechnicalSEOGuardianRole,
-    IntentContentEditorRole,
-    MobileFirstCustomerRole,
-    ComparisonShopperRole,
-    UXCROReviewerRole,
+    MobileConversionAuditorRole,
     DeveloperMaintainerRole,
     AdversarialRefereeRole
 )
@@ -59,21 +59,21 @@ def run_swarm_audit(target_file_path: str):
 
     # Sequential Evaluation: 7 Analyst Roles
     analyst_roles = [
-        GSCAnalystRole(),
+        SERPDifficultyAnalystRole(),
+        OffPageAuthorityCriticRole(),
+        InformationGainAuditorRole(),
+        SkepticalContractorPersonaRole(),
         TechnicalSEOGuardianRole(),
-        IntentContentEditorRole(),
-        MobileFirstCustomerRole(),
-        ComparisonShopperRole(),
-        UXCROReviewerRole(),
+        MobileConversionAuditorRole(),
         DeveloperMaintainerRole()
     ]
 
     evaluations = []
-    print("=" * 72)
-    print(f"SEO SWARM LITE: 8-ROLE AUDIT PIPELINE")
+    print("=" * 76)
+    print(f"SEO SWARM ADVERSARIAL REALITY AUDIT")
     print(f"Target: {target_file_path}")
     print(f"Run ID: {run_id} | Mode: Single-Thread Green Profile")
-    print("=" * 72 + "\n")
+    print("=" * 76 + "\n")
 
     for role in analyst_roles:
         res = role.evaluate(page_data, evidence_map)
@@ -81,22 +81,26 @@ def run_swarm_audit(target_file_path: str):
         store_evaluation(conn, run_id, res["agent_id"], res["role"], res["status"], res["score"], res["verdict"], res["observations"], res["recommendations"])
         print(f"[{res['role']}] Score: {res['score']}/100 -> Verdict: {res['verdict']}")
         for obs in res["observations"]:
-            print(f"   • [{obs['type'].upper()}] {obs['statement']}")
+            print(f"   * [{obs['type'].upper()}] {obs['statement']}")
         print()
 
     # Role 8: Adversarial Referee Synthesizer
     referee = AdversarialRefereeRole()
     final_verdict = referee.evaluate_swarm(evaluations)
-    print("=" * 72)
+    print("=" * 76)
     print(f"[Adversarial Evidence Referee Consensus]")
-    print(f"Composite Score : {final_verdict['composite_score']} / 100")
-    print(f"Status Verdict  : {final_verdict['consensus']}")
-    print(f"Total Roles Run : {final_verdict['total_evaluations']} active constrained roles")
-    print("=" * 72)
+    print(f"Composite Reality Score : {final_verdict['composite_score']} / 100")
+    print(f"Status Verdict           : {final_verdict['consensus']}")
+    print(f"Total Roles Run          : {final_verdict['total_evaluations']} active constrained roles")
+    if final_verdict.get("priority_recommendations"):
+        print("\nPriority Remediation Actions:")
+        for r in final_verdict["priority_recommendations"]:
+            print(f"   -> [{r.get('benefit', 'high').upper()}] {r.get('title')}: {r.get('action')}")
+    print("=" * 76 + "\n")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         target = sys.argv[1]
     else:
-        target = r"c:\WebSmitherz\websmitherz\pages\local\roofing-seo-waco-tx.php"
+        target = r"c:\WebSmitherz\websmitherz\pages\services\roofing-seo.php"
     run_swarm_audit(target)
