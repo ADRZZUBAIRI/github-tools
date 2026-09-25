@@ -102,10 +102,13 @@ def run_swarm_audit(target_file_path: str, task_preset: str = "single_page_audit
             print(f"   * [{r.get('benefit', 'high').upper()}] {r.get('title')}: {r.get('action')}")
     print("=" * 88 + "\n")
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Run 62-Role SEO Swarm Simulator")
     parser.add_argument("target", nargs="?", default=r"c:\WebSmitherz\websmitherz\pages\services\roofing-seo.php")
     parser.add_argument("--preset", default="local_roofing_audit", choices=list(TASK_ACTIVATION_PRESETS.keys()))
     args = parser.parse_args()
     
     run_swarm_audit(args.target, args.preset)
+
+if __name__ == "__main__":
+    main()
