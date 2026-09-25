@@ -1,7 +1,7 @@
 """
-CLI Entry Point & Sequential Orchestrator for SEO Swarm Lite
+CLI Entry Point & Brutal Orchestrator for SEO Swarm Simulator
 ============================================================
-Runs the hardware-safe 8-role sequential audit pipeline with SQLite evidence logging.
+Runs the ruthless 8-persona adversarial reality pipeline.
 """
 
 import os
@@ -12,13 +12,13 @@ from typing import Dict, Any
 
 from seo_swarm.store.database import init_db, store_run, store_evidence, store_evaluation
 from seo_swarm.roles.roster import (
-    SERPDifficultyAnalystRole,
-    OffPageAuthorityCriticRole,
-    InformationGainAuditorRole,
-    SkepticalContractorPersonaRole,
-    TechnicalSEOGuardianRole,
-    MobileConversionAuditorRole,
-    DeveloperMaintainerRole,
+    SERPExecutionerRole,
+    BacklinkDebtCollectorRole,
+    InformationGainTribunalRole,
+    SkepticalBlueCollarCFORole,
+    CoreWebVitalsTerminatorRole,
+    SchemaEntityProsecutorRole,
+    CompetitorPredatorRole,
     AdversarialRefereeRole
 )
 
@@ -45,9 +45,8 @@ def run_swarm_audit(target_file_path: str):
 
     run_id = f"RUN-{uuid.uuid4().hex[:8].upper()}"
     conn = init_db()
-    store_run(conn, run_id, target_file_path, "green")
+    store_run(conn, run_id, target_file_path, "brutal_depression_mode")
 
-    # Ingest Evidence
     evidence_map = {
         "EVD-TITLE": title,
         "EVD-SCHEMA": "application/ld+json" in html_content,
@@ -57,46 +56,58 @@ def run_swarm_audit(target_file_path: str):
     for k, v in evidence_map.items():
         store_evidence(conn, run_id, k, "source_inspection", target_file_path, "1-end", str(v), {"value": v})
 
-    # Sequential Evaluation: 7 Analyst Roles
     analyst_roles = [
-        SERPDifficultyAnalystRole(),
-        OffPageAuthorityCriticRole(),
-        InformationGainAuditorRole(),
-        SkepticalContractorPersonaRole(),
-        TechnicalSEOGuardianRole(),
-        MobileConversionAuditorRole(),
-        DeveloperMaintainerRole()
+        SERPExecutionerRole(),
+        BacklinkDebtCollectorRole(),
+        InformationGainTribunalRole(),
+        SkepticalBlueCollarCFORole(),
+        CoreWebVitalsTerminatorRole(),
+        SchemaEntityProsecutorRole(),
+        CompetitorPredatorRole()
     ]
 
     evaluations = []
-    print("=" * 76)
-    print(f"SEO SWARM ADVERSARIAL REALITY AUDIT")
-    print(f"Target: {target_file_path}")
-    print(f"Run ID: {run_id} | Mode: Single-Thread Green Profile")
-    print("=" * 76 + "\n")
+    print("\n" + "#" * 80)
+    print(" " * 18 + "BRUTAL ADVERSARIAL SEO SWARM: REALITY AUDIT")
+    print(" " * 22 + "(The Depressing Truth About Your SERP Rankings)")
+    print("#" * 80)
+    print(f" Target Target : {target_file_path}")
+    print(f" Run ID        : {run_id} | Mode: Full Reality Execution")
+    print("#" * 80 + "\n")
 
     for role in analyst_roles:
         res = role.evaluate(page_data, evidence_map)
         evaluations.append(res)
         store_evaluation(conn, run_id, res["agent_id"], res["role"], res["status"], res["score"], res["verdict"], res["observations"], res["recommendations"])
-        print(f"[{res['role']}] Score: {res['score']}/100 -> Verdict: {res['verdict']}")
+        
+        status_symbol = "[FAIL]" if res["score"] < 50 else ("[WARN]" if res["score"] < 75 else "[PASS]")
+        print(f"{status_symbol} [{res['role']}] Score: {res['score']}/100 -> Verdict: {res['verdict']}")
         for obs in res["observations"]:
-            print(f"   * [{obs['type'].upper()}] {obs['statement']}")
+            prefix = "FATAL" if obs["type"] == "fatal_flaw" else ("TRUTH" if obs["type"] == "harsh_truth" else "OBS")
+            print(f"   |-- [{prefix}] {obs['statement']}")
         print()
 
-    # Role 8: Adversarial Referee Synthesizer
     referee = AdversarialRefereeRole()
     final_verdict = referee.evaluate_swarm(evaluations)
-    print("=" * 76)
-    print(f"[Adversarial Evidence Referee Consensus]")
-    print(f"Composite Reality Score : {final_verdict['composite_score']} / 100")
-    print(f"Status Verdict           : {final_verdict['consensus']}")
-    print(f"Total Roles Run          : {final_verdict['total_evaluations']} active constrained roles")
+    
+    print("=" * 80)
+    print("                        ADVERSARIAL REALITY CONSENSUS")
+    print("=" * 80)
+    print(f" Composite Reality Score : {final_verdict['composite_reality_score']} / 100")
+    print(f" Depression Index        : {final_verdict['depression_index']}")
+    print(f" Algorithmic Verdict     : {final_verdict['consensus']}")
+    print(f" Fatal Flaws Exposed     : {final_verdict['fatal_flaws_count']} critical structural blockers")
+    
+    if final_verdict["fatal_flaws"]:
+        print("\n[!] FATAL ARCHITECTURAL & STRATEGIC FLAWS:")
+        for idx, flaw in enumerate(final_verdict["fatal_flaws"], 1):
+            print(f"   {idx}. {flaw}")
+            
     if final_verdict.get("priority_recommendations"):
-        print("\nPriority Remediation Actions:")
+        print("\n[+] MANDATORY RESCUE ACTIONS (HOW TO STOP GETTING 0 CLICKS):")
         for r in final_verdict["priority_recommendations"]:
-            print(f"   -> [{r.get('benefit', 'high').upper()}] {r.get('title')}: {r.get('action')}")
-    print("=" * 76 + "\n")
+            print(f"   * [{r.get('benefit', 'high').upper()}] {r.get('title')}: {r.get('action')}")
+    print("=" * 80 + "\n")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

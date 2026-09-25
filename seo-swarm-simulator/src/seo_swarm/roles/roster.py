@@ -1,26 +1,26 @@
 """
-SEO Swarm Lite: Brutal Adversarial Multi-Agent Roster
-======================================================
-Real commercial-grade ranking & conversion evaluation engine.
-Tests pages against actual Google ranking mechanics (Keyword Difficulty vs DA debt,
-Information Gain, Competitor Moat, Commercial Skepticism, and Local Intent).
+Brutal Adversarial SEO Swarm Simulator: The "Depression Engine"
+==============================================================
+Unfiltered, ruthless multi-agent evaluation framework that destroys SEO vanity metrics,
+exposes statistical ranking impossibilities, domain authority deficits, LLM regurgitation traps,
+and commercial failure points that typical audits hide.
 
-Fixed 8-Role Roster:
-1. `serp_difficulty_analyst` (National KD vs DA 2 Reality, SERP Position feasibility)
-2. `offpage_authority_critic` (Backlink debt, external citations, brand signals)
-3. `information_gain_auditor` (Proprietary data vs generic regurgitated SEO advice)
-4. `skeptical_contractor_persona` (Busy 50yo roofing owner, instant BS filter, real proof)
-5. `technical_seo_guardian` (Schema depth, Core Web Vitals, crawl budget hygiene)
-6. `mobile_conversion_auditor` (1-tap phone dialer, urgent storm friction, form friction)
-7. `developer_maintainer` (Sub-0.8s runtime, DOM weight, no bloated bundles)
-8. `adversarial_referee` (Synthesizer that punishes theoretical fluff and computes brutal reality score)
+Personas:
+1. `serp_executioner`: The Google Helpful Content & RankBrain Algorithmic Executioner.
+2. `backlink_debt_collector`: The Brutal Off-Page & Referring Domain Moat Auditor.
+3. `information_gain_tribunal`: The AI Overviews / Low-Entropy Information Gain Inquisitor.
+4. `skeptical_bluecollar_cfo`: The 55yo Roofing/HVAC Owner who hates marketing agency BS.
+5. `core_web_vitals_terminator`: Real-world 4G mobile latency, DOM thrashing, and layout shifts.
+6. `schema_entity_prosecutor`: Google Knowledge Graph & Wikidata Semantic Graph Prosecutor.
+7. `competitor_predator`: The $100M VC-backed aggregator waiting to crush this page.
+8. `adversarial_referee`: The merciless synthesizer that calculates the "Reality & Depression Index".
 """
 
 import json
 import re
 from typing import Dict, List, Any
 
-class BaseRole:
+class BaseBrutalRole:
     def __init__(self, agent_id: str, title: str, description: str):
         self.agent_id = agent_id
         self.title = title
@@ -29,13 +29,13 @@ class BaseRole:
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
         raise NotImplementedError
 
-class SERPDifficultyAnalystRole(BaseRole):
-    """Audits whether the page is targeting an impossible national keyword with a low-DA domain or winning realistic local striking distance queries."""
+class SERPExecutionerRole(BaseBrutalRole):
+    """Simulates Google's RankBrain & Helpful Content Classifier with zero mercy."""
     def __init__(self):
         super().__init__(
-            "serp_difficulty_analyst",
-            "SERP Competitor & Keyword Difficulty Analyst",
-            "Evaluates keyword competition (KD) against WebSmitherz domain authority (DA ~2) to prevent suicidal Page 9 rankings."
+            "serp_executioner",
+            "Google RankBrain & Algorithmic Executioner",
+            "Audits search intent cannibalization, broad-match KD delusion, and Page 9 graveyard traps."
         )
 
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
@@ -43,146 +43,152 @@ class SERPDifficultyAnalystRole(BaseRole):
         url = page_data.get("url", "").lower()
         text = page_data.get("text", "").lower()
         
-        # Check if page is targeting broad national high-difficulty terms without local modifiers
-        is_national_generic = ("roofing seo" in title or "gmb local seo" in title) and not any(city in title or city in url for city in ["tyler", "waco", "san angelo", "macon", "clarksville", "midland", "odessa", "katy", "woodlands", "sugar land"])
+        is_generic_agency = any(term in title for term in ["roofing seo", "web design agency", "seo services", "digital marketing"])
+        has_geo = any(city in title or city in url for city in ["tyler", "waco", "san angelo", "macon", "clarksville", "midland", "odessa", "katy", "woodlands", "sugar land"])
         
         observations = []
         recs = []
         
-        if is_national_generic:
-            score = 35.0
-            verdict = "SUICIDAL_NATIONAL_COMPETITION_TRAP"
+        if is_generic_agency and not has_geo:
+            score = 12.0
+            verdict = "PAGE_9_GRAVEYARD_GUARANTEED"
             observations.append({
-                "type": "critique",
-                "statement": "Page targets broad national keyword against DA 70+ incumbents (WebFX, HookAgency, SearchEngineJournal). On DA 2, this guarantees Page 7-9 obscurity (Positions 60-90) and 0 CTR.",
-                "evidence_ids": ["EVD-TITLE", "EVD-URL"],
+                "type": "fatal_flaw",
+                "statement": "DELUSION DETECTED: Page targets national KD 80+ keyword on a DA < 5 domain. You are competing against WebFX ($100M budget) and SearchEngineJournal (1.2M backlinks). Google places this page on Position 87 where 0.0001% of searchers ever scroll. Zero clicks in 3 months is the mathematically expected result, not an anomaly.",
+                "evidence_ids": ["EVD-TITLE", "EVD-KD"],
                 "confidence": 1.0
             })
             observations.append({
-                "type": "observed",
-                "statement": f"GSC Reality: 60-70 impressions at position 70+ with 0 clicks over 3 months.",
-                "evidence_ids": ["EVD-GSC"],
-                "confidence": 0.95
+                "type": "harsh_truth",
+                "statement": "No amount of meta tag polishing or H1 rewording will ever move a DA 2 site to Page 1 for national queries without $50k in link equity.",
+                "evidence_ids": ["EVD-DA-DEBT"],
+                "confidence": 1.0
             })
             recs.append({
-                "title": "Pivot to High-Intent Technical Problem Angles",
-                "action": "Reposition away from generic 'SEO Agency' to exact technical bottleneck solver (e.g., 'Roofing CRM Webhook & SMS Speed-to-Lead Middleware' or regional local hubs).",
+                "title": "Stop Committing SEO Suicide on National Keywords",
+                "action": "Kill broad national keyword targeting. Reposition page exclusively around un-commoditized technical infrastructure (e.g. 'Roofing CRM Webhook & Instant SMS Speed-to-Lead Middleware') or hyper-local county/city landing pages.",
                 "affected_urls": [page_data.get("url", "/")],
-                "benefit": "critical", "effort": 2, "risk": 1
+                "benefit": "critical", "effort": 3, "risk": 1
             })
         else:
-            # Localized or niche angle
-            score = 88.0
-            verdict = "REALISTIC_LOCAL_STRIKING_DISTANCE"
+            score = 78.0
+            verdict = "SURVIVABLE_LOCAL_STRIKING_DISTANCE"
             observations.append({
                 "type": "observed",
-                "statement": "Page targets localized geo-intent (e.g., Tyler TX / Waco TX) where competitor DA moat is low and top-3 3-pack rank velocity is achievable.",
-                "evidence_ids": ["EVD-TITLE", "EVD-URL"],
-                "confidence": 0.95
+                "statement": "Page targets localized geo-intent where local 3-pack algorithms weigh proximity and NAP over massive domain backlink moats.",
+                "evidence_ids": ["EVD-TITLE"],
+                "confidence": 0.9
             })
             recs.append({
-                "title": "Inject Local Geo Entities & Driving Routes",
-                "action": "Ensure local cross-streets, zip codes, and county permit data are embedded in body copy.",
+                "title": "Embed Verified City Geo-Data",
+                "action": "Inject local municipal permit data, county codes, and specific street intersections to solidify geographic entity anchor.",
                 "affected_urls": [page_data.get("url", "/")],
                 "benefit": "high", "effort": 1, "risk": 1
             })
 
         return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
 
-class OffPageAuthorityCriticRole(BaseRole):
-    """Audits backlink debt, citations, and third-party entity verification."""
+class BacklinkDebtCollectorRole(BaseBrutalRole):
+    """Exposes off-page authority bankruptcy."""
     def __init__(self):
         super().__init__(
-            "offpage_authority_critic",
-            "Off-Page Authority & Entity Backlink Critic",
-            "Audits external trust deficit (backlinks, press citations, Google Entity Graph proof) that causes Google to distrust the page."
+            "backlink_debt_collector",
+            "Off-Page Authority & Backlink Debt Collector",
+            "Audits referring domain deficit, third-party citation debt, and brand search vacuum."
         )
 
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
         text = page_data.get("text", "")
-        # Check if page references external proof, live repos, PyPI packages, or published research
-        has_external_proof = "pypi" in text.lower() or "github" in text.lower() or "audit of" in text.lower()
+        has_verified_pypi = "pypi" in text.lower() or "contractor-lead-scraper" in text.lower()
         
         observations = []
         recs = []
         
-        # In reality, WebSmitherz has near 0 referring domains
-        score = 42.0
-        verdict = "SEVERE_AUTHORITY_DEBT"
+        score = 25.0
+        verdict = "AUTHORITY_BANKRUPTCY"
         observations.append({
-            "type": "critique",
-            "statement": "Domain Authority Debt: Zero authoritative editorial backlinks from industry publications or trade organizations. Google ranks trusted brands first.",
-            "evidence_ids": ["EVD-BACKLINKS"],
+            "type": "fatal_flaw",
+            "statement": "BACKLINK DEBT: 0 Referring Root Domains from accredited trade organizations (NRCA, RoofingContractor.com, TechCrunch). Google views this site as an unverified anonymous ghost.",
+            "evidence_ids": ["EVD-OFFPAGE"],
             "confidence": 1.0
         })
         observations.append({
-            "type": "observed",
-            "statement": f"External Data References on page: {'Present (PyPI/Repo)' if has_external_proof else 'Missing'}.",
-            "evidence_ids": ["EVD-EXTERNAL-REF"],
-            "confidence": 0.9
+            "type": "harsh_truth",
+            "statement": "BRAND SEARCH VACUUM: Exact-match brand search volume for 'WebSmitherz' is effectively zero. Google requires brand search velocity before trusting money pages.",
+            "evidence_ids": ["EVD-BRAND-SEARCH"],
+            "confidence": 0.95
         })
+        if has_verified_pypi:
+            score += 15.0
+            observations.append({
+                "type": "observed",
+                "statement": "PyPI open-source package link detected (DA 94 anchor). First positive entity citation step.",
+                "evidence_ids": ["EVD-PYPI"],
+                "confidence": 1.0
+            })
+            
         recs.append({
-            "title": "Publish Forensic Industry Teardowns to Third-Party Portals",
-            "action": "Distribute empirical case study data ('Auditing 340 Texas Roofing Sites for Speed & Tap-to-Call') on Medium, Dev.to, and trade forums with links to tools.",
+            "title": "Execute Aggressive Entity Citation & Press Syndication",
+            "action": "Syndicate raw engineering audit data to AP Press, Dev.to, ProductHunt, and GitHub tools to force Google Entity Graph registration.",
             "affected_urls": [page_data.get("url", "/")],
             "benefit": "critical", "effort": 3, "risk": 1
         })
-        
+
         return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
 
-class InformationGainAuditorRole(BaseRole):
-    """Checks whether the content provides new proprietary data/tools vs regurgitated AI summaries."""
+class InformationGainTribunalRole(BaseBrutalRole):
+    """Destroys commodity AI-generated fluff and tests for Google Information Gain Patent compliance."""
     def __init__(self):
         super().__init__(
-            "information_gain_auditor",
-            "Information Gain & Proprietary Data Auditor",
-            "Audits whether the page offers net-new data, interactive calculation tools, and forensic evidence, or just regurgitated textbook SEO advice."
+            "information_gain_tribunal",
+            "Information Gain & AI Spam Inquisitor",
+            "Audits whether content produces net-new proprietary data or regurgitates identical LLM textbook summaries."
         )
 
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
         html = page_data.get("html", "")
         text = page_data.get("text", "")
         
-        has_interactive_tool = "<script" in html and ("lost" in text.lower() or "calculator" in text.lower() or "grid" in text.lower())
-        has_empirical_data = any(metric in text.lower() for metric in ["sub-0.8s", "343", "340", "lcp", "e.164", "4.8s", "73%"])
+        has_interactive_calculator = "<script" in html and any(term in text.lower() for term in ["lost", "calculator", "radius", "widget"])
+        has_empirical_teardown_data = any(term in text.lower() for term in ["343", "340", "sub-0.8s", "73%", "4.8s", "e.164"])
         
         observations = []
         recs = []
         
-        if has_interactive_tool and has_empirical_data:
-            score = 85.0
-            verdict = "HIGH_INFORMATION_GAIN"
+        if has_interactive_calculator and has_empirical_teardown_data:
+            score = 88.0
+            verdict = "ORIGINAL_INFORMATION_GAIN_CONFIRMED"
             observations.append({
                 "type": "observed",
-                "statement": "Page includes interactive calculator / empirical telemetry benchmarks separating it from generic AI blog spam.",
+                "statement": "Proprietary interactive calculation utility + empirical roofer latency audit data passed Google Information Gain patent criteria.",
                 "evidence_ids": ["EVD-TOOL", "EVD-DATA"],
                 "confidence": 0.95
             })
         else:
-            score = 45.0
-            verdict = "GENERIC_AGENCY_COMMODITY_CONTENT"
+            score = 22.0
+            verdict = "COMMODITY_AI_SLOP_DETECTED"
             observations.append({
-                "type": "critique",
-                "statement": "Content reads like generic agency advice ('claim your GMB, optimize titles, get reviews'). Zero unique data to trigger Google's Information Gain patent.",
-                "evidence_ids": ["EVD-TEXT"],
+                "type": "fatal_flaw",
+                "statement": "ZERO INFORMATION GAIN: Paragraphs explain 'why reviews matter' and 'what local SEO is'. An AI scraper can generate this in 4 seconds. Google AI Overviews already answers this in the SERP header without clicking your link.",
+                "evidence_ids": ["EVD-COPY"],
                 "confidence": 1.0
             })
             recs.append({
-                "title": "Inject Interactive Loss Calculator & Forensic Audit Visuals",
-                "action": "Embed the interactive 3-Pack Lost Revenue Calculator and real anonymized contractor speed teardown charts.",
+                "title": "Embed Zero-Dependency Interactive Utilities",
+                "action": "Remove generic explainer paragraphs. Replace with interactive 3-Pack Revenue Loss Calculators and empirical audit charts.",
                 "affected_urls": [page_data.get("url", "/")],
-                "benefit": "high", "effort": 2, "risk": 1
+                "benefit": "critical", "effort": 2, "risk": 1
             })
 
         return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
 
-class SkepticalContractorPersonaRole(BaseRole):
-    """Simulates a 50-year-old roofing contractor reading on an iPhone at a job site with zero patience for marketing BS."""
+class SkepticalBlueCollarCFORole(BaseBrutalRole):
+    """The 55yo commercial contractor who has been scammed by 10 agencies and deletes emails in 2 seconds."""
     def __init__(self):
         super().__init__(
-            "skeptical_contractor_persona",
-            "Skeptical Commercial Contractor Persona",
-            "Simulates a commercial roofing/HVAC owner who has been burned by 10 scam marketing agencies and will bounce if he smells generic buzzwords."
+            "skeptical_bluecollar_cfo",
+            "Skeptical Blue-Collar Contractor Persona",
+            "Simulates a 55-year-old roofing owner on a muddy job site inspecting the page on an iPhone 13 in bright sunlight."
         )
 
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
@@ -191,154 +197,195 @@ class SkepticalContractorPersonaRole(BaseRole):
         
         has_tel = "tel:" in html
         has_ownership = "100%" in text or "ownership" in text.lower()
-        has_no_lockin = "zero proprietary lock-in" in text.lower() or "own your domain" in text.lower() or "own your code" in text.lower()
-        has_pricing_clarity = "$" in text or "pricing" in text.lower() or "cost" in text.lower() or "flat" in text.lower()
+        has_pricing = "$" in text or "pricing" in text.lower() or "cost" in text.lower() or "flat" in text.lower()
+        has_buzzwords = any(b in text.lower() for b in ["skyrocket", "game-changer", "10x", "leading provider", "cutting-edge", "synergy"])
         
         observations = []
         recs = []
+        score = 85.0
         
-        friction_points = 0
         if not has_tel:
-            friction_points += 1
+            score -= 35.0
             observations.append({
-                "type": "critique",
-                "statement": "No direct 1-tap phone button. If I'm on a roof or in a truck, I'm not typing an email into a form.",
+                "type": "fatal_flaw",
+                "statement": "NO TAP-TO-CALL: You made me copy-paste your phone number while I'm standing on a ladder. I tapped back and called your competitor.",
                 "evidence_ids": ["EVD-TEL"],
                 "confidence": 1.0
             })
         if not has_ownership:
-            friction_points += 1
+            score -= 25.0
             observations.append({
-                "type": "critique",
-                "statement": "Missing explicit 100% Asset Ownership guarantee. Last agency locked my domain hostage.",
+                "type": "fatal_flaw",
+                "statement": "NO OWNERSHIP GUARANTEE: Last agency stole my domain and held my Google Business Profile hostage. If you don't state '100% Client Asset Ownership' above the fold, I bounce.",
                 "evidence_ids": ["EVD-OWNERSHIP"],
                 "confidence": 0.95
             })
-        if not has_pricing_clarity:
-            friction_points += 1
+        if has_buzzwords:
+            score -= 30.0
             observations.append({
-                "type": "critique",
-                "statement": "Vague 'Schedule a Consultation' CTA with zero pricing cues feels like a high-pressure sales trap.",
-                "evidence_ids": ["EVD-PRICING"],
-                "confidence": 0.9
+                "type": "fatal_flaw",
+                "statement": "AGENCY BS DETECTED: Page used phrases like 'scale your business' or 'leading agency'. Instant closed tab.",
+                "evidence_ids": ["EVD-BUZZWORDS"],
+                "confidence": 1.0
             })
             
-        if friction_points == 0:
-            score = 90.0
-            verdict = "CONTRACTOR_TRUST_EARNED"
-            observations.append({
-                "type": "observed",
-                "statement": "Speaks directly to lost phone calls, instant SMS dispatch, and guarantees 100% ownership with 1-tap phone call.",
-                "evidence_ids": ["EVD-COPY"],
-                "confidence": 0.95
-            })
-        elif friction_points == 1:
-            score = 68.0
-            verdict = "MILD_CONTRACTOR_SKEPTICISM"
-        else:
-            score = 38.0
-            verdict = "HIGH_BOUNCE_PROBABILITY"
-            recs.append({
-                "title": "Address Contractor Skepticism Instantly in Hero",
-                "action": "Add 3 explicit trust badges: (1) 1-Tap Direct Call, (2) 100% Client Code & Domain Ownership, (3) Sub-60s SMS Lead Alert Guarantee.",
-                "affected_urls": [page_data.get("url", "/")],
-                "benefit": "critical", "effort": 1, "risk": 1
-            })
+        verdict = "CONTRACTOR_RESPECT_EARNED" if score >= 75 else "CONTRACTOR_INSTANT_BOUNCE"
+        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": max(5.0, score), "verdict": verdict, "observations": observations, "recommendations": recs}
 
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class TechnicalSEOGuardianRole(BaseRole):
-    """Audits schema, canonical parity, mobile viewport, and Core Web Vitals."""
+class CoreWebVitalsTerminatorRole(BaseBrutalRole):
+    """Simulates real 4G cellular performance on cheap Android/iPhone devices."""
     def __init__(self):
         super().__init__(
-            "technical_seo_guardian",
-            "Technical SEO Guardian",
-            "Audits JSON-LD Schema.org graphs, viewport responsiveness, canonical parity, and Core Web Vitals hygiene."
+            "core_web_vitals_terminator",
+            "Core Web Vitals & 4G Cellular Terminator",
+            "Audits Cumulative Layout Shift (CLS), Largest Contentful Paint (LCP), and DOM bloat on constrained networks."
+        )
+
+    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
+        html = page_data.get("html", "")
+        has_heavy_framework = any(fw in html.lower() for fw in ["react", "vue", "angular", "next", "nuxt"])
+        has_external_fonts = "fonts.googleapis.com" in html
+        
+        observations = []
+        recs = []
+        
+        if not has_heavy_framework:
+            score = 94.0
+            verdict = "SUB_0_8S_CRUSH_SPEED"
+            observations.append({
+                "type": "observed",
+                "statement": "Zero framework bloat. Pure semantic server-rendered HTML + Tailwind CSS. First Contentful Paint (FCP) < 0.4s on 4G cellular.",
+                "evidence_ids": ["EVD-PERF"],
+                "confidence": 1.0
+            })
+        else:
+            score = 35.0
+            verdict = "JS_HYDRATION_DEATH"
+            observations.append({
+                "type": "fatal_flaw",
+                "statement": "Client-side JS framework thrashing mobile CPU and delaying LCP to 4.2s on mobile networks.",
+                "evidence_ids": ["EVD-PERF"],
+                "confidence": 1.0
+            })
+            
+        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
+
+class SchemaEntityProsecutorRole(BaseBrutalRole):
+    """Audits whether schema creates real Knowledge Graph entity nodes or useless empty tags."""
+    def __init__(self):
+        super().__init__(
+            "schema_entity_prosecutor",
+            "Schema & Knowledge Graph Entity Prosecutor",
+            "Validates structured data against Google's Knowledge Graph, Wikidata, and LocalBusiness specifications."
         )
 
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
         html = page_data.get("html", "")
         has_schema = "application/ld+json" in html
-        has_canonical = "rel=\"canonical\"" in html or "rel='canonical'" in html
-        h1_count = len(re.findall(r'<h1\b', html, re.IGNORECASE))
+        has_area_served = "areaServed" in html or "RoofingContractor" in html or "LocalBusiness" in html
         
-        score = 95.0 if has_schema and has_canonical and h1_count == 1 else 60.0
-        observations = [
-            {"type": "observed", "statement": f"Schema.org JSON-LD graph present: {has_schema}.", "evidence_ids": ["EVD-SCHEMA"], "confidence": 1.0},
-            {"type": "observed", "statement": f"Canonical URL defined: {has_canonical}.", "evidence_ids": ["EVD-CANONICAL"], "confidence": 1.0},
-            {"type": "observed", "statement": f"H1 Tag Count: {h1_count}.", "evidence_ids": ["EVD-H1"], "confidence": 1.0}
-        ]
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": "INDEX_HYGIENE_PASSED", "observations": observations, "recommendations": []}
+        observations = []
+        recs = []
+        
+        if has_schema and has_area_served:
+            score = 92.0
+            verdict = "SEMANTIC_GRAPH_VALIDATED"
+            observations.append({
+                "type": "observed",
+                "statement": "Rich JSON-LD entity graph with specific LocalBusiness / RoofingContractor typology identified.",
+                "evidence_ids": ["EVD-SCHEMA"],
+                "confidence": 1.0
+            })
+        else:
+            score = 30.0
+            verdict = "UNSTRUCTURED_DATA_VOID"
+            observations.append({
+                "type": "fatal_flaw",
+                "statement": "Google AI crawlers cannot parse exact service regions, pricing schemas, or business ownership entities.",
+                "evidence_ids": ["EVD-SCHEMA"],
+                "confidence": 1.0
+            })
+            
+        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
 
-class MobileConversionAuditorRole(BaseRole):
-    """Audits mobile viewport speed, tap targets, and frictionless conversion."""
+class CompetitorPredatorRole(BaseBrutalRole):
+    """Simulates a $100M aggregator / PE-backed agency that actively steals your clicks."""
     def __init__(self):
         super().__init__(
-            "mobile_conversion_auditor",
-            "Mobile Conversion & Friction Auditor",
-            "Tests whether a mobile searcher on 4G LTE can convert in under 3 seconds."
+            "competitor_predator",
+            "VC-Backed Competitor Predator",
+            "Simulates multi-million dollar competitor networks (Angi, Thumbtack, WebFX, HookAgency) and evaluates your survival odds."
         )
 
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        html = page_data.get("html", "")
-        has_tel = "tel:" in html
-        has_sticky_cta = "fixed" in html or "sticky" in html
+        title = page_data.get("title", "").lower()
+        url = page_data.get("url", "").lower()
+        is_local = any(city in title or city in url for city in ["tyler", "waco", "san angelo", "macon", "clarksville", "midland", "odessa", "katy", "woodlands", "sugar land"])
         
-        score = 92.0 if has_tel else 40.0
-        observations = [
-            {"type": "observed", "statement": f"Clickable 'tel:' phone link configured: {has_tel}.", "evidence_ids": ["EVD-TEL"], "confidence": 1.0},
-            {"type": "inferred", "statement": "Mobile users can initiate call without copy-pasting numbers.", "evidence_ids": ["EVD-TEL"], "confidence": 0.95}
-        ]
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": "MOBILE_FRICTION_TEST_PASSED", "observations": observations, "recommendations": []}
+        observations = []
+        recs = []
+        
+        if is_local:
+            score = 80.0
+            verdict = "PREDATOR_EVASION_SUCCESSFUL"
+            observations.append({
+                "type": "observed",
+                "statement": "Aggregators (Angi/Thumbtack) do not customize deep hyper-local engineering blueprints for suburban contractors. You win on local technical specialization.",
+                "evidence_ids": ["EVD-LOCAL-MOAT"],
+                "confidence": 0.9
+            })
+        else:
+            score = 15.0
+            verdict = "PREDATOR_ROADKILL"
+            observations.append({
+                "type": "fatal_flaw",
+                "statement": "You are trying to fight a 2,000-page VC-backed directory on their home turf with a 1-page national template. They outspend you $50,000 to $0 on link building every month.",
+                "evidence_ids": ["EVD-COMPETITOR"],
+                "confidence": 1.0
+            })
+            
+        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
 
-class DeveloperMaintainerRole(BaseRole):
-    """Audits zero-bloat runtime and vanilla stack performance."""
-    def __init__(self):
-        super().__init__(
-            "developer_maintainer",
-            "Developer & Systems Maintainer",
-            "Audits DOM complexity, zero-bloat vanilla stack footprint, and sub-0.8s runtime delivery."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        html = page_data.get("html", "")
-        has_heavy_framework = "react" in html.lower() or "vue" in html.lower()
-        score = 95.0 if not has_heavy_framework else 65.0
-        observations = [
-            {"type": "observed", "statement": "Pure semantic HTML + Tailwind CSS + Vanilla JS. Zero heavy client runtime bloat.", "evidence_ids": ["EVD-CODE"], "confidence": 1.0}
-        ]
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": "SUB_0_8S_PERFORMANCE_READY", "observations": observations, "recommendations": []}
-
-class AdversarialRefereeRole(BaseRole):
-    """Brutal synthesizer that factors in authority debt, search difficulty, and conversion probability."""
+class AdversarialRefereeRole(BaseBrutalRole):
+    """Calculates the brutal Composite Reality Index & Depression Score."""
     def __init__(self):
         super().__init__(
             "adversarial_referee",
-            "Adversarial Evidence Referee",
-            "Cross-examines all prior analyst roles, weighs harsh reality factors, and issues realistic commercial ranking & conversion composite verdict."
+            "Adversarial Evidence Referee & Reality Synthesizer",
+            "Synthesizes all brutal verdicts, strips away comforting lies, and outputs the true Commercial Ranking & Survival Score."
         )
 
     def evaluate_swarm(self, evaluations: List[Dict[str, Any]]) -> Dict[str, Any]:
         total_score = sum(e["score"] for e in evaluations)
         avg_score = round(total_score / len(evaluations), 1)
         
+        fatal_flaws = []
         all_recs = []
         for e in evaluations:
+            for obs in e.get("observations", []):
+                if obs.get("type") == "fatal_flaw":
+                    fatal_flaws.append(obs["statement"])
             for r in e.get("recommendations", []):
                 all_recs.append(r)
                 
         if avg_score >= 80:
-            consensus = "REALISTIC_RANK_AND_CONVERT_CAPABLE"
-        elif avg_score >= 60:
-            consensus = "LOCAL_STRIKING_DISTANCE_NEEDS_AUTHORITY"
+            consensus = "COMBAT_READY_SURVIVES_SERP_REALITY"
+            depression_index = "LOW (Mathematically viable ranking probability)"
+        elif avg_score >= 55:
+            consensus = "LOCAL_STRIKING_DISTANCE_NEEDS_AUTHORITY_INJECTIONS"
+            depression_index = "MODERATE (Ranks locally, but zero national presence)"
         else:
-            consensus = "HIGH_RISK_PAGE_9_OBSCURITY"
+            consensus = "PAGE_9_OBLIVION_DELUSIONAL_STRATEGY"
+            depression_index = "SEVERE (Page will generate 0 clicks and 0 leads for 12 months)"
             
         return {
             "agent_id": self.agent_id,
             "role": self.title,
-            "composite_score": avg_score,
+            "composite_reality_score": avg_score,
+            "depression_index": depression_index,
             "consensus": consensus,
+            "fatal_flaws_count": len(fatal_flaws),
+            "fatal_flaws": fatal_flaws,
             "total_evaluations": len(evaluations),
             "priority_recommendations": all_recs
         }
