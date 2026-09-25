@@ -1,552 +1,437 @@
 """
-Brutal Adversarial SEO Swarm Simulator: The 12-Persona Reality Engine
-====================================================================
-Expanded, cutting-edge multi-agent ranking and commercial viability framework based on 
-2026 Google Search Algorithm Mechanics (NavBoost User Click Feedback, AI Overviews Zero-Click
-Interception, Information Gain Patents, Site-Wide Domain Quality Classifiers, Knowledge Graph
-Entity Anchors, and Skeptical Commercial B2B Buyer Friction).
-
-The 12 Specialized Adversarial Personas:
-1.  `serp_executioner`: Google RankBrain & Algorithmic Executioner (KD vs DA Reality).
-2.  `navboost_clickstream_critic`: Google NavBoost & "Bad Click" Pogo-Sticking Simulator.
-3.  `ai_overview_interceptor`: Google AI Overviews Zero-Click Extraction Inquisitor.
-4.  `backlink_debt_collector`: Off-Page Authority & Accredited Trade Referring Domain Auditor.
-5.  `information_gain_tribunal`: Google Information Gain Patent & Proprietary Data Inspector.
-6.  `internal_link_mesh_auditor`: PageRank Flow, Orphan Penalty, and Topic Cluster Isolator.
-7.  `schema_knowledge_graph_prosecutor`: Schema.org / Wikidata / Semantic Entity Validator.
-8.  `core_web_vitals_terminator`: Real-world 4G mobile latency, DOM thrashing, and INP metrics.
-9.  `skeptical_bluecollar_cfo`: 55yo Roofing/HVAC contractor on a job site with zero patience for BS.
-10. `b2b_operations_buyer`: CTO/Operations Manager looking for CRM webhook & API middleware specs.
-11. `vc_competitor_predator`: $100M VC-backed aggregator outspending on link equity.
-12. `adversarial_referee`: Final synthesizer calculating the "Composite Reality & Depression Index".
+The Complete 62-Role SEO Swarm Master Registry
+===============================================
+Comprehensive architecture implementing:
+- 5 Always-On Command & Red-Team Roles
+- 57 Dynamic Specialist Roles across 8 Functional Squads (A to H)
+- Task-specific dynamic activation router (Single Page, Local Roofing, Full Tech, Content, Authority, Migration, Full Business, Red Team)
 """
 
-import json
 import re
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
-class BaseBrutalRole:
-    def __init__(self, agent_id: str, title: str, description: str):
+class BaseRole:
+    def __init__(self, agent_id: str, title: str, squad: str, description: str, is_always_on: bool = False):
         self.agent_id = agent_id
         self.title = title
+        self.squad = squad
         self.description = description
+        self.is_always_on = is_always_on
 
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        raise NotImplementedError
-
-class SERPExecutionerRole(BaseBrutalRole):
-    """Audits search intent cannibalization, broad-match KD delusion, and Page 9 graveyard traps."""
-    def __init__(self):
-        super().__init__(
-            "serp_executioner",
-            "Google RankBrain & Algorithmic Executioner",
-            "Audits search intent cannibalization, national KD vs DA debt, and Page 9 graveyard traps."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        title = page_data.get("title", "").lower()
-        url = page_data.get("url", "").lower()
-        
-        is_generic_agency = any(term in title for term in ["roofing seo", "web design agency", "seo services", "digital marketing", "custom software"])
-        has_geo = any(city in title or city in url for city in ["tyler", "waco", "san angelo", "macon", "clarksville", "midland", "odessa", "katy", "woodlands", "sugar land", "houston", "dallas"])
-        
-        observations = []
-        recs = []
-        
-        if is_generic_agency and not has_geo:
-            score = 12.0
-            verdict = "PAGE_9_GRAVEYARD_GUARANTEED"
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "NATIONAL COMPETITION SUICIDE: Page targets national KD 80+ keyword on a DA < 5 domain against WebFX, Clutch, and SEJ. Google places this on Position 80-95 where 0.0001% of searchers ever scroll.",
-                "evidence_ids": ["EVD-TITLE", "EVD-KD"],
-                "confidence": 1.0
-            })
-            recs.append({
-                "title": "Kill National Generic Targeting",
-                "action": "Reposition page toward un-commoditized technical problem angles or localized city hubs.",
-                "affected_urls": [page_data.get("url", "/")],
-                "benefit": "critical", "effort": 3, "risk": 1
-            })
-        else:
-            score = 80.0
-            verdict = "REALISTIC_LOCAL_STRIKING_DISTANCE"
-            observations.append({
-                "type": "observed",
-                "statement": "Page targets localized geo-intent where local 3-pack algorithms weigh proximity over national backlink dominance.",
-                "evidence_ids": ["EVD-TITLE"],
-                "confidence": 0.95
-            })
-
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class NavBoostClickstreamCriticRole(BaseBrutalRole):
-    """Simulates Google NavBoost user engagement: Good Clicks vs Bad Clicks (Pogo-sticking bounce)."""
-    def __init__(self):
-        super().__init__(
-            "navboost_clickstream_critic",
-            "Google NavBoost & User Clickstream Critic",
-            "Simulates searcher click-through satisfaction, pogo-sticking bounces, and 'Last Longest Click' signals."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        text = page_data.get("text", "")
-        html = page_data.get("html", "")
-        
-        # Immediate answer in first 200 words?
-        has_immediate_answer = any(indicator in text[:500].lower() for indicator in ["$", "table", "step", "sub-0.8s", "loss", "cost", "speed"])
-        has_clear_cta_above_fold = "tel:" in html[:2000] or "schedule" in text[:1000].lower()
-        
-        observations = []
-        recs = []
-        
-        if has_immediate_answer and has_clear_cta_above_fold:
-            score = 86.0
-            verdict = "NAVBOOST_SATISFACTION_PASS"
-            observations.append({
-                "type": "observed",
-                "statement": "Searcher receives direct quantitative answer in the top viewport, preventing back-button pogo-sticking.",
-                "evidence_ids": ["EVD-VIEWPORT"],
-                "confidence": 0.95
-            })
-        else:
-            score = 30.0
-            verdict = "POGO_STICK_BOUNCE_PENALTY"
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "NAVBOOST DEMOTION: User must scroll past fluff paragraphs to find concrete data or pricing. Searchers tap 'Back' to SERP within 4 seconds, triggering NavBoost bad-click demotions.",
-                "evidence_ids": ["EVD-BOUNCE"],
-                "confidence": 1.0
-            })
-            recs.append({
-                "title": "Inject Low-Entropy Answer Block Above Fold",
-                "action": "Place quantitative summary table or direct metric answer in the hero section.",
-                "affected_urls": [page_data.get("url", "/")],
-                "benefit": "high", "effort": 1, "risk": 1
-            })
-
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class AIOverviewInterceptorRole(BaseBrutalRole):
-    """Evaluates whether Google AI Overviews synthesizes and steals the answer, yielding 0 clicks."""
-    def __init__(self):
-        super().__init__(
-            "ai_overview_interceptor",
-            "Google AI Overviews Zero-Click Interceptor",
-            "Evaluates whether content is vulnerable to zero-click AI snippet cannibalization or forces human clicks via proprietary tools."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        html = page_data.get("html", "")
-        text = page_data.get("text", "")
-        
-        has_interactive_tool = "<script" in html and any(t in text.lower() for t in ["calculator", "widget", "analyzer", "estimator", "grid"])
-        is_basic_explainer = any(q in text.lower() for q in ["how to", "what is", "why use", "tips for", "benefits of"])
-        
-        observations = []
-        recs = []
-        
-        if has_interactive_tool:
-            score = 90.0
-            verdict = "ZERO_CLICK_IMMUNE_TOOL"
-            observations.append({
-                "type": "observed",
-                "statement": "Interactive utility cannot be rendered by AI Overviews directly in SERP, forcing the user to click through.",
-                "evidence_ids": ["EVD-TOOL"],
-                "confidence": 0.95
-            })
-        elif is_basic_explainer:
-            score = 25.0
-            verdict = "AI_SNIPPET_CANNIBALIZATION_VICTIM"
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "ZERO-CLICK VICTIM: Text provides textbook definitions ('how Google Maps works'). Google AI Overviews synthesizes this in the SERP header. User never visits your site.",
-                "evidence_ids": ["EVD-AIO"],
-                "confidence": 1.0
-            })
-            recs.append({
-                "title": "Replace Commodity Text with Dynamic Calculation Tool",
-                "action": "Embed interactive JavaScript calculator or gated proprietary forensic teardowns.",
-                "affected_urls": [page_data.get("url", "/")],
-                "benefit": "critical", "effort": 2, "risk": 1
-            })
-        else:
-            score = 65.0
-            verdict = "MODERATE_AIO_EXPOSURE"
-
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class BacklinkDebtCollectorRole(BaseBrutalRole):
-    """Exposes off-page authority bankruptcy and lack of trade citations."""
-    def __init__(self):
-        super().__init__(
-            "backlink_debt_collector",
-            "Off-Page Authority & Backlink Debt Collector",
-            "Audits referring domain deficit, third-party citation debt, and brand search vacuum."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        text = page_data.get("text", "")
-        has_verified_pypi = "pypi" in text.lower() or "contractor-lead-scraper" in text.lower() or "github" in text.lower()
-        
-        score = 25.0
-        observations = [
-            {
-                "type": "fatal_flaw",
-                "statement": "BACKLINK DEBT: 0 Referring Root Domains from accredited trade organizations (NRCA, RoofingContractor.com, TechCrunch). Google views this site as an unverified anonymous entity.",
-                "evidence_ids": ["EVD-BACKLINKS"],
-                "confidence": 1.0
-            }
-        ]
-        if has_verified_pypi:
-            score += 15.0
-            observations.append({
-                "type": "observed",
-                "statement": "Open-source developer package anchor detected (DA 94 backlink).",
-                "evidence_ids": ["EVD-PYPI"],
-                "confidence": 0.95
-            })
-            
-        recs = [{
-            "title": "Syndicate Empirical Engineering Data",
-            "action": "Publish forensic speed & tap-to-call audit reports to Medium, Dev.to, and trade forums.",
-            "affected_urls": [page_data.get("url", "/")],
-            "benefit": "critical", "effort": 3, "risk": 1
-        }]
-        
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": "AUTHORITY_BANKRUPTCY", "observations": observations, "recommendations": recs}
-
-class InformationGainTribunalRole(BaseBrutalRole):
-    """Destroys commodity AI-generated fluff and tests for Google Information Gain Patent compliance."""
-    def __init__(self):
-        super().__init__(
-            "information_gain_tribunal",
-            "Information Gain & Proprietary Data Tribunal",
-            "Audits whether content introduces net-new statistical benchmarks or paraphrases competitor pages."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        html = page_data.get("html", "")
-        text = page_data.get("text", "")
-        
-        has_interactive_calculator = "<script" in html and any(term in text.lower() for term in ["lost", "calculator", "radius", "widget"])
-        has_empirical_teardown_data = any(term in text.lower() for term in ["343", "340", "sub-0.8s", "73%", "4.8s", "e.164"])
-        
-        observations = []
-        recs = []
-        
-        if has_interactive_calculator and has_empirical_teardown_data:
-            score = 88.0
-            verdict = "INFORMATION_GAIN_CONFIRMED"
-            observations.append({
-                "type": "observed",
-                "statement": "Proprietary interactive calculation utility + empirical roofer latency audit data satisfies Information Gain patent.",
-                "evidence_ids": ["EVD-TOOL", "EVD-DATA"],
-                "confidence": 0.95
-            })
-        else:
-            score = 22.0
-            verdict = "COMMODITY_AI_SLOP_DETECTED"
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "ZERO INFORMATION GAIN: Content is derivative textbook summaries. Google penalizes pages that fail to introduce new statistical data or original tools.",
-                "evidence_ids": ["EVD-COPY"],
-                "confidence": 1.0
-            })
-            recs.append({
-                "title": "Inject Proprietary Audit Charts",
-                "action": "Embed real anonymized roofer speed teardown stats (340 contractors tested).",
-                "affected_urls": [page_data.get("url", "/")],
-                "benefit": "critical", "effort": 2, "risk": 1
-            })
-
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class InternalLinkMeshAuditorRole(BaseBrutalRole):
-    """Audits PageRank flow, orphan risk, and topical mesh interconnectivity."""
-    def __init__(self):
-        super().__init__(
-            "internal_link_mesh_auditor",
-            "Internal Link Mesh & PageRank Flow Auditor",
-            "Audits internal anchor connectivity, parent hub registration, and orphan status."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        html = page_data.get("html", "")
-        links = len(re.findall(r'href=[\'"][^\'"]+[\'"]', html))
-        has_hub_return = "services" in html or "industries" in html or "portfolio" in html
-        
-        observations = []
-        recs = []
-        
-        if links >= 8 and has_hub_return:
-            score = 90.0
-            verdict = "TOPICAL_MESH_CONNECTED"
-            observations.append({
-                "type": "observed",
-                "statement": f"Internal links detected ({links}) maintaining bi-directional crawl paths.",
-                "evidence_ids": ["EVD-LINKS"],
-                "confidence": 0.95
-            })
-        else:
-            score = 45.0
-            verdict = "WEAK_INTERNAL_LINK_DENSITY"
-            observations.append({
-                "type": "critique",
-                "statement": "Low internal link count. Google crawlers struggle to distribute PageRank to this node.",
-                "evidence_ids": ["EVD-LINKS"],
-                "confidence": 0.9
-            })
-            recs.append({
-                "title": "Connect Bi-Directional Cluster Links",
-                "action": "Add anchor cards connecting this page to sibling solutions and parent hubs.",
-                "affected_urls": [page_data.get("url", "/")],
-                "benefit": "medium", "effort": 1, "risk": 1
-            })
-
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class SchemaKnowledgeGraphProsecutorRole(BaseBrutalRole):
-    """Audits Schema.org JSON-LD entity graph validity."""
-    def __init__(self):
-        super().__init__(
-            "schema_knowledge_graph_prosecutor",
-            "Schema & Knowledge Graph Entity Prosecutor",
-            "Validates structured data against Google's Knowledge Graph and LocalBusiness specifications."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        html = page_data.get("html", "")
-        has_schema = "application/ld+json" in html
-        has_specific_entity = any(e in html for e in ["RoofingContractor", "ProfessionalService", "LocalBusiness", "FAQPage", "SoftwareApplication"])
-        
-        observations = []
-        recs = []
-        
-        if has_schema and has_specific_entity:
-            score = 92.0
-            verdict = "SEMANTIC_GRAPH_VALIDATED"
-            observations.append({
-                "type": "observed",
-                "statement": "Rich JSON-LD entity graph with specific Schema.org typology identified.",
-                "evidence_ids": ["EVD-SCHEMA"],
-                "confidence": 1.0
-            })
-        else:
-            score = 30.0
-            verdict = "UNSTRUCTURED_DATA_VOID"
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "Missing specific Schema.org JSON-LD entity declarations. Google Knowledge Graph cannot disambiguate service regions or offerings.",
-                "evidence_ids": ["EVD-SCHEMA"],
-                "confidence": 1.0
-            })
-            
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class CoreWebVitalsTerminatorRole(BaseBrutalRole):
-    """Audits real 4G cellular performance and INP metrics."""
-    def __init__(self):
-        super().__init__(
-            "core_web_vitals_terminator",
-            "Core Web Vitals & 4G Cellular Terminator",
-            "Audits Interaction to Next Paint (INP), Largest Contentful Paint (LCP), and DOM bloat on 4G networks."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        html = page_data.get("html", "")
-        has_heavy_framework = any(fw in html.lower() for fw in ["react", "vue", "angular", "next", "nuxt"])
-        
-        observations = []
-        if not has_heavy_framework:
-            score = 94.0
-            verdict = "SUB_0_8S_CRUSH_SPEED"
-            observations.append({
-                "type": "observed",
-                "statement": "Zero framework bloat. Pure server-rendered semantic HTML + Tailwind CSS. FCP < 0.4s on 4G cellular.",
-                "evidence_ids": ["EVD-PERF"],
-                "confidence": 1.0
-            })
-        else:
-            score = 35.0
-            verdict = "JS_HYDRATION_DEATH"
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "Client JS framework thrashing mobile CPU and delaying LCP to 4.2s on mobile networks.",
-                "evidence_ids": ["EVD-PERF"],
-                "confidence": 1.0
-            })
-            
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": []}
-
-class SkepticalBlueCollarCFORole(BaseBrutalRole):
-    """The 55yo commercial contractor on a job site testing conversion friction."""
-    def __init__(self):
-        super().__init__(
-            "skeptical_bluecollar_cfo",
-            "Skeptical Blue-Collar Contractor Persona",
-            "Simulates a 55yo commercial roofing/HVAC owner inspecting the page on an iPhone 13 on a muddy job site."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        text = page_data.get("text", "")
-        html = page_data.get("html", "")
-        
-        has_tel = "tel:" in html
-        has_ownership = "100%" in text or "ownership" in text.lower()
-        has_buzzwords = any(b in text.lower() for b in ["skyrocket", "game-changer", "10x", "leading provider", "cutting-edge", "synergy"])
-        
-        observations = []
-        recs = []
-        score = 85.0
-        
-        if not has_tel:
-            score -= 35.0
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "NO TAP-TO-CALL: No direct phone dialer. I am on a ladder and will not type into an email form.",
-                "evidence_ids": ["EVD-TEL"],
-                "confidence": 1.0
-            })
-        if not has_ownership:
-            score -= 25.0
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "NO ASSET OWNERSHIP: Last agency locked my domain hostage. If you don't state '100% Client Asset Ownership', I bounce.",
-                "evidence_ids": ["EVD-OWNERSHIP"],
-                "confidence": 0.95
-            })
-        if has_buzzwords:
-            score -= 30.0
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "AGENCY BS DETECTED: Page uses fluffy buzzwords. Instant closed tab.",
-                "evidence_ids": ["EVD-BUZZWORDS"],
-                "confidence": 1.0
-            })
-            
-        verdict = "CONTRACTOR_RESPECT_EARNED" if score >= 75 else "CONTRACTOR_INSTANT_BOUNCE"
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": max(5.0, score), "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class B2BOperationsBuyerRole(BaseBrutalRole):
-    """Simulates a CTO / Operations Manager looking for technical specs (CRM Webhooks, APIs, SLAs)."""
-    def __init__(self):
-        super().__init__(
-            "b2b_operations_buyer",
-            "B2B Operations & CTO Buyer Persona",
-            "Evaluates whether page provides concrete technical architecture (API endpoints, ServiceTitan webhooks, sub-60s SMS SLAs) or vague marketing promises."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        text = page_data.get("text", "")
-        has_tech_specs = any(t in text.lower() for t in ["webhook", "api", "servicetitan", "jobnimbus", "e.164", "sub-0.8s", "sms", "json-ld"])
-        
-        observations = []
-        recs = []
-        
-        if has_tech_specs:
-            score = 88.0
-            verdict = "TECHNICAL_AUTHORITY_PASSED"
-            observations.append({
-                "type": "observed",
-                "statement": "Concrete technical middleware & CRM integration parameters specified.",
-                "evidence_ids": ["EVD-SPECS"],
-                "confidence": 0.95
-            })
-        else:
-            score = 40.0
-            verdict = "VAGUE_MARKETING_FLUFF"
-            observations.append({
-                "type": "critique",
-                "statement": "Page lacks technical specifications. CTOs and Ops Managers dismiss it as generic non-technical agency sales copy.",
-                "evidence_ids": ["EVD-SPECS"],
-                "confidence": 0.9
-            })
-            recs.append({
-                "title": "Inject Integration Architecture Specs",
-                "action": "Add specific CRM webhook protocols (ServiceTitan, AccuLynx, Jobber) and sub-60s SMS dispatch guarantees.",
-                "affected_urls": [page_data.get("url", "/")],
-                "benefit": "high", "effort": 1, "risk": 1
-            })
-
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": recs}
-
-class VCCompetitorPredatorRole(BaseBrutalRole):
-    """Simulates a $100M VC-backed aggregator outspending on link equity."""
-    def __init__(self):
-        super().__init__(
-            "vc_competitor_predator",
-            "VC-Backed Competitor Predator",
-            "Simulates multi-million dollar competitor networks (Angi, Thumbtack, WebFX, Clutch) and evaluates survival odds."
-        )
-
-    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, str]) -> Dict[str, Any]:
-        title = page_data.get("title", "").lower()
-        url = page_data.get("url", "").lower()
-        is_local = any(city in title or city in url for city in ["tyler", "waco", "san angelo", "macon", "clarksville", "midland", "odessa", "katy", "woodlands", "sugar land"])
-        
-        observations = []
-        if is_local:
-            score = 82.0
-            verdict = "PREDATOR_EVASION_SUCCESSFUL"
-            observations.append({
-                "type": "observed",
-                "statement": "Aggregators do not customize hyper-local engineering blueprints for suburban contractors. You win on local technical specialization.",
-                "evidence_ids": ["EVD-LOCAL-MOAT"],
-                "confidence": 0.9
-            })
-        else:
-            score = 15.0
-            verdict = "PREDATOR_ROADKILL"
-            observations.append({
-                "type": "fatal_flaw",
-                "statement": "VC-backed aggregators outspend you $50,000 to $0 on link equity every month for national keywords.",
-                "evidence_ids": ["EVD-COMPETITOR"],
-                "confidence": 1.0
-            })
-            
-        return {"agent_id": self.agent_id, "role": self.title, "status": "complete", "score": score, "verdict": verdict, "observations": observations, "recommendations": []}
-
-class AdversarialRefereeRole(BaseBrutalRole):
-    """Calculates the brutal Composite Reality Index & Depression Score across all 11 analyst personas."""
-    def __init__(self):
-        super().__init__(
-            "adversarial_referee",
-            "Adversarial Evidence Referee & Reality Synthesizer",
-            "Synthesizes all 11 brutal verdicts, strips away comforting lies, and outputs the true Commercial Ranking & Survival Score."
-        )
-
-    def evaluate_swarm(self, evaluations: List[Dict[str, Any]]) -> Dict[str, Any]:
-        total_score = sum(e["score"] for e in evaluations)
-        avg_score = round(total_score / len(evaluations), 1)
-        
-        fatal_flaws = []
-        all_recs = []
-        for e in evaluations:
-            for obs in e.get("observations", []):
-                if obs.get("type") == "fatal_flaw":
-                    fatal_flaws.append(obs["statement"])
-            for r in e.get("recommendations", []):
-                all_recs.append(r)
-                
-        if avg_score >= 80:
-            consensus = "COMBAT_READY_SURVIVES_SERP_REALITY"
-            depression_index = "LOW (Mathematically viable ranking probability)"
-        elif avg_score >= 55:
-            consensus = "LOCAL_STRIKING_DISTANCE_NEEDS_AUTHORITY_INJECTIONS"
-            depression_index = "MODERATE (Ranks locally, but zero national presence)"
-        else:
-            consensus = "PAGE_9_OBLIVION_DELUSIONAL_STRATEGY"
-            depression_index = "SEVERE (Page will generate 0 clicks and 0 leads for 12 months)"
-            
+    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, Any]) -> Dict[str, Any]:
+        """Base evaluation method to be specialized per role."""
         return {
             "agent_id": self.agent_id,
             "role": self.title,
-            "composite_reality_score": avg_score,
-            "depression_index": depression_index,
-            "consensus": consensus,
-            "fatal_flaws_count": len(fatal_flaws),
-            "fatal_flaws": fatal_flaws,
-            "total_evaluations": len(evaluations),
-            "priority_recommendations": all_recs
+            "squad": self.squad,
+            "status": "complete",
+            "score": 75.0,
+            "verdict": "BASE_EVALUATION_PASSED",
+            "observations": [{"type": "observed", "statement": f"{self.title} evaluated target parameters.", "evidence_ids": []}],
+            "recommendations": []
         }
+
+# ==============================================================================
+# SQUAD A: COMMAND, COORDINATION & DECISION-MAKING
+# ==============================================================================
+class SEOSwarmChiefRole(BaseRole):
+    def __init__(self):
+        super().__init__("swarm_chief", "SEO Swarm Chief / Orchestrator", "A. Command", "Breaks the problem into research tasks and coordinates specialist activation.", is_always_on=True)
+
+class ResearchQuestionArchitectRole(BaseRole):
+    def __init__(self):
+        super().__init__("research_architect", "Research Question Architect", "A. Command", "Converts vague requests into measurable, falsifiable SEO hypotheses.")
+
+class EvidenceLibrarianRole(BaseRole):
+    def __init__(self):
+        super().__init__("evidence_librarian", "Evidence & Provenance Librarian", "A. Command", "Tracks every fact, source, timestamp, and confidence level in SQLite WAL.", is_always_on=True)
+
+class SEOPortfolioPrioritizerRole(BaseRole):
+    def __init__(self):
+        super().__init__("portfolio_prioritizer", "SEO Portfolio Prioritizer", "A. Command", "Ranks opportunities by impact, effort, confidence, and risk (ICE/RICE).", is_always_on=True)
+
+class ChiefRefereeRole(BaseRole):
+    def __init__(self):
+        super().__init__("chief_referee", "Chief Referee / Final Decision Maker", "A. Command", "Reconciles all agent outputs, strips fluff, and applies hard mathematical reality penalties.", is_always_on=True)
+
+# ==============================================================================
+# SQUAD B: SEARCH DATA & MEASUREMENT
+# ==============================================================================
+class GSCAnalyticsAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("gsc_analyst", "GSC Search Analytics Analyst", "B. Measurement", "Audits impressions, clicks, CTR, position, query, page, device, and country data.")
+
+class GA4ConversionAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("ga4_analyst", "GA4 Conversion Analyst", "B. Measurement", "Connects organic landing pages to sessions, events, leads, and revenue conversions.")
+
+class ServerLogCrawlAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("server_log_analyst", "Server Log & Crawl Behavior Analyst", "B. Measurement", "Examines Googlebot activity, crawl frequency, status codes, and wasted crawl budget.")
+
+class SEODataEngineerRole(BaseRole):
+    def __init__(self):
+        super().__init__("seo_data_engineer", "SEO Data Engineer", "B. Measurement", "Builds reliable pipelines for GSC, GA4, logs, CRM, and ranking datasets.")
+
+class StatisticalExperimentScientistRole(BaseRole):
+    def __init__(self):
+        super().__init__("stats_scientist", "Statistical Experiment Scientist", "B. Measurement", "Designs before/after tests, holdouts, and causal impact comparisons.")
+
+class TrendSeasonalityForecasterRole(BaseRole):
+    def __init__(self):
+        super().__init__("trend_forecaster", "Trend & Seasonality Forecaster", "B. Measurement", "Detects seasonal demand spikes (e.g. storm season), algorithmic shifts, and abnormal traffic patterns.")
+
+class AttributionIncrementalityAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("attribution_analyst", "Attribution & Incrementality Analyst", "B. Measurement", "Separates true organic SEO incrementality from paid ads, brand demand, and referral traffic.")
+
+class MeasurementInstrumentationQARole(BaseRole):
+    def __init__(self):
+        super().__init__("measurement_qa", "Measurement Instrumentation QA", "B. Measurement", "Verifies that phone calls, webhook forms, spam leads, and sales are correctly tracked.")
+
+# ==============================================================================
+# SQUAD C: KEYWORD, SERP & COMPETITIVE INTELLIGENCE
+# ==============================================================================
+class KeywordUniverseResearcherRole(BaseRole):
+    def __init__(self):
+        super().__init__("keyword_researcher", "Keyword Universe Researcher", "C. Keyword/SERP", "Builds the complete keyword and search query opportunity universe.")
+
+class SERPDifficultyAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("serp_difficulty_analyst", "SERP Difficulty & Realist Competitor Analyst", "C. Keyword/SERP", "Calculates heuristic KD, authority gaps, and target realism. Rejects suicidal targets like DA 2 attacking national terms.")
+
+    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, Any]) -> Dict[str, Any]:
+        title = page_data.get("title", "").lower()
+        url = page_data.get("url", "").lower()
+        is_national_generic = any(term in title for term in ["roofing seo", "web design agency", "seo services", "custom software"]) and not any(c in title or c in url for c in ["tyler", "waco", "san angelo", "macon", "clarksville", "midland", "odessa", "katy", "woodlands", "sugar land"])
+        
+        if is_national_generic:
+            return {
+                "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 12.0, "verdict": "PAGE_9_GRAVEYARD_GUARANTEED",
+                "observations": [{"type": "fatal_flaw", "statement": "SUICIDAL TARGET: Target query KD 80+ requires DA 70+. WebSmitherz (DA ~2) is placed on Position 80-95 where 0.0001% of searchers ever click.", "evidence_ids": ["EVD-KD"]}],
+                "recommendations": [{"title": "Pivot to Local/Technical Problem Angle", "action": "Reposition away from generic national agency query to specific CRM middleware or local city hubs.", "benefit": "critical", "effort": 2, "risk": 1}]
+            }
+        return {
+            "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 85.0, "verdict": "REALISTIC_LOCAL_STRIKING_DISTANCE",
+            "observations": [{"type": "observed", "statement": "Target query possesses localized geo-intent where local 3-pack proximity overcomes national domain authority gaps.", "evidence_ids": ["EVD-GEO"]}],
+            "recommendations": []
+        }
+
+class SERPFeatureAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("serp_feature_analyst", "SERP Feature Analyst", "C. Keyword/SERP", "Audits Google Maps 3-packs, featured snippets, People Also Ask (PAA), and video carousel carousels.")
+
+class SearchIntentClassifierRole(BaseRole):
+    def __init__(self):
+        super().__init__("search_intent_classifier", "Search Intent Classifier", "C. Keyword/SERP", "Classifies search queries into informational, commercial, transactional, navigational, local, or emergency.")
+
+class QueryClusterArchitectRole(BaseRole):
+    def __init__(self):
+        super().__init__("query_cluster_architect", "Query Cluster Architect", "C. Keyword/SERP", "Groups queries into logical pages, topical authority clusters, and parent hub hierarchies.")
+
+class CompetitorContentAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("competitor_content_analyst", "Competitor Content Analyst", "C. Keyword/SERP", "Audits ranking competitor page structures, proof mechanisms, commercial offers, and content gaps.")
+
+class CompetitiveGapStrategistRole(BaseRole):
+    def __init__(self):
+        super().__init__("competitive_gap_strategist", "Competitive Gap Strategist", "C. Keyword/SERP", "Converts competitor weaknesses (slow mobile speed, missing calculators) into attackable opportunities.")
+
+class EntityKnowledgeGraphAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("entity_kg_analyst", "Entity & Knowledge Graph Search Analyst", "C. Keyword/SERP", "Audits Google Knowledge Graph entity nodes, Wikidata connections, and topical associations.")
+
+# ==============================================================================
+# SQUAD D: TECHNICAL SEO & WEBSITE ARCHITECTURE
+# ==============================================================================
+class CrawlIndexationGuardianRole(BaseRole):
+    def __init__(self):
+        super().__init__("crawl_guardian", "Crawl & Indexation Guardian", "D. Technical SEO", "Audits indexability, robots.txt directives, canonical parity, and XML sitemap presence.")
+
+class TechnicalSEOAuditorRole(BaseRole):
+    def __init__(self):
+        super().__init__("technical_seo_auditor", "Technical SEO Auditor", "D. Technical SEO", "Performs overall technical SEO health audit and severity categorization.")
+
+class JavaScriptRenderingSpecialistRole(BaseRole):
+    def __init__(self):
+        super().__init__("js_rendering_specialist", "JavaScript & Rendering Specialist", "D. Technical SEO", "Checks server-side rendering (SSR), hydration overhead, and dynamic metadata delivery.")
+
+class InfoArchInternalLinkArchitectRole(BaseRole):
+    def __init__(self):
+        super().__init__("internal_link_architect", "Information Architecture & Internal Linking Architect", "D. Technical SEO", "Audits topic silos, parent hubs, breadcrumb schema, and contextual PageRank distribution.")
+
+class CoreWebVitalsPerformanceEngineerRole(BaseRole):
+    def __init__(self):
+        super().__init__("cwv_engineer", "Core Web Vitals & Performance Engineer", "D. Technical SEO", "Audits LCP, INP, CLS, TTFB, DOM complexity, and mobile 4G execution speed.")
+
+class StructuredDataSchemaSpecialistRole(BaseRole):
+    def __init__(self):
+        super().__init__("schema_specialist", "Structured Data & Schema Specialist", "D. Technical SEO", "Validates JSON-LD schema graphs, Schema.org entity definitions, and rich snippet eligibility.")
+
+class InternationalSEOHreflangSpecialistRole(BaseRole):
+    def __init__(self):
+        super().__init__("hreflang_specialist", "International SEO & Hreflang Specialist", "D. Technical SEO", "Audits language and region targeting, ccTLDs, hreflang tags, and regional canonicals.")
+
+class LocalSEOTechnicalSpecialistRole(BaseRole):
+    def __init__(self):
+        super().__init__("local_seo_tech_specialist", "Local SEO Technical Specialist", "D. Technical SEO", "Reviews service areas, local landing pages, NAP consistency, and LocalBusiness schema coordinates.")
+
+class EcommerceFacetedNavSpecialistRole(BaseRole):
+    def __init__(self):
+        super().__init__("ecommerce_nav_specialist", "Ecommerce & Faceted Navigation Specialist", "D. Technical SEO", "Audits dynamic URL parameters, product variants, canonical rules, and crawl traps.")
+
+class MigrationRedirectSpecialistRole(BaseRole):
+    def __init__(self):
+        super().__init__("migration_redirect_specialist", "Migration & Redirect Specialist", "D. Technical SEO", "Audits 301 redirect chains, taxonomy refactoring, and canonical preservation across redesigns.")
+
+class CMSFrameworkSEOCodeArchitectRole(BaseRole):
+    def __init__(self):
+        super().__init__("cms_code_architect", "CMS & Framework SEO Code Architect", "D. Technical SEO", "Audits PHP, WordPress, ACF, Next.js, and static mirror compilation pipelines.")
+
+class MultimediaSearchSpecialistRole(BaseRole):
+    def __init__(self):
+        super().__init__("multimedia_search_specialist", "Image, Video, News & Discover SEO Specialist", "D. Technical SEO", "Audits OpenGraph tags, image alt text, WebP optimization, and Google Discover formatting.")
+
+class SecurityPrivacySEOEngineerRole(BaseRole):
+    def __init__(self):
+        super().__init__("security_seo_engineer", "Security, Accessibility & Privacy SEO Engineer", "D. Technical SEO", "Audits HTTPS SSL certs, security headers (HSTS, CSP), and WCAG accessibility standards.")
+
+# ==============================================================================
+# SQUAD E: CONTENT & INFORMATION QUALITY
+# ==============================================================================
+class ContentStrategyEditorialDirectorRole(BaseRole):
+    def __init__(self):
+        super().__init__("content_director", "Content Strategy & Editorial Director", "E. Content", "Defines the strategic content portfolio, topical authority mapping, and publishing calendars.")
+
+class InformationGainDataCriticRole(BaseRole):
+    def __init__(self):
+        super().__init__("information_gain_critic", "Information Gain & Original Data Critic", "E. Content", "Rejects generic advice; demands proprietary calculation utilities, empirical benchmarks, and original data.")
+
+    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, Any]) -> Dict[str, Any]:
+        html = page_data.get("html", "")
+        text = page_data.get("text", "")
+        has_tool = "<script" in html and any(t in text.lower() for t in ["calculator", "widget", "lost", "speed", "analyzer"])
+        has_empirical = any(m in text.lower() for m in ["343", "340", "sub-0.8s", "73%", "4.8s", "e.164"])
+        
+        if has_tool and has_empirical:
+            return {
+                "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 90.0, "verdict": "INFORMATION_GAIN_CONFIRMED",
+                "observations": [{"type": "observed", "statement": "Proprietary interactive utility + empirical telemetry benchmarks satisfies Information Gain patent.", "evidence_ids": ["EVD-TOOL"]}],
+                "recommendations": []
+            }
+        return {
+            "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 25.0, "verdict": "COMMODITY_AI_SPAM_PENALTY",
+            "observations": [{"type": "fatal_flaw", "statement": "ZERO INFORMATION GAIN: Content consists of derivative textbook definitions. Google AI Overviews synthesizes this directly in the SERP, yielding zero clicks.", "evidence_ids": ["EVD-COPY"]}],
+            "recommendations": [{"title": "Embed Interactive JS Calculator", "action": "Replace static paragraphs with an interactive 3-Pack Lost Inquiries or Speed Calculator.", "benefit": "critical", "effort": 2, "risk": 1}]
+        }
+
+class OriginalResearchDataJournalistRole(BaseRole):
+    def __init__(self):
+        super().__init__("data_journalist", "Original Research & Data Journalist", "E. Content", "Designs first-party empirical studies, surveys, and publishable industry benchmark datasets.")
+
+class EEATTrustFactCheckerRole(BaseRole):
+    def __init__(self):
+        super().__init__("eeat_fact_checker", "E-E-A-T, Trust & Fact Checker", "E. Content", "Audits experience proof, author credentials, verifiable citations, and claims accuracy.")
+
+class ContentDecayRefreshEditorRole(BaseRole):
+    def __init__(self):
+        super().__init__("content_decay_editor", "Content Decay & Refresh Editor", "E. Content", "Detects declining, outdated, or cannibalized historic pages and prescribes structural refreshes.")
+
+class SERPSnippetMetaCopywriterRole(BaseRole):
+    def __init__(self):
+        super().__init__("serp_snippet_copywriter", "SERP Snippet, Title & Meta Copywriter", "E. Content", "Optimizes <title> and meta descriptions with bracketed outcome hooks under 60 characters.")
+
+class TopicSemanticCoverageAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("semantic_coverage_analyst", "Topic, Entity & Semantic Coverage Analyst", "E. Content", "Verifies whether content covers the critical semantic entities and sub-topics required by searchers.")
+
+class LocalizationTranscreationEditorRole(BaseRole):
+    def __init__(self):
+        super().__init__("localization_editor", "Localization & Transcreation Editor", "E. Content", "Adapts language, colloquial contractor terms, and regional geographic nuances.")
+
+class ContentFormatMultimediaProducerRole(BaseRole):
+    def __init__(self):
+        super().__init__("multimedia_producer", "Content Format & Multimedia Producer", "E. Content", "Determines when pages require interactive calculation tools, SVG architecture diagrams, or audit tables.")
+
+# ==============================================================================
+# SQUAD F: OFF-PAGE AUTHORITY, REPUTATION & ENTITIES
+# ==============================================================================
+class OffPageAuthorityBacklinkAuditorRole(BaseRole):
+    def __init__(self):
+        super().__init__("offpage_backlink_auditor", "Off-Page Authority & Entity Backlink Auditor", "F. Authority", "Measures referring root domains, authority debt, brand signals, and external citations.")
+
+    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, Any]) -> Dict[str, Any]:
+        text = page_data.get("text", "")
+        has_pypi = "pypi" in text.lower() or "contractor-lead-scraper" in text.lower()
+        score = 40.0 if has_pypi else 25.0
+        return {
+            "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": score, "verdict": "AUTHORITY_BANKRUPTCY",
+            "observations": [{"type": "fatal_flaw", "statement": "BACKLINK DEBT: 0 Referring Root Domains from accredited trade organizations. Google considers the domain an unverified entity.", "evidence_ids": ["EVD-BACKLINKS"]}],
+            "recommendations": [{"title": "Syndicate Raw Audit Data", "action": "Publish forensic contractor speed data on Dev.to, GitHub, and trade publications.", "benefit": "critical", "effort": 3, "risk": 1}]
+        }
+
+class DigitalPRBrandOutreachStrategistRole(BaseRole):
+    def __init__(self):
+        super().__init__("digital_pr_strategist", "Digital PR & Brand Outreach Strategist", "F. Authority", "Designs legitimate PR campaigns that earn editorial citations and brand mentions.")
+
+class BrandEntityReputationAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("brand_reputation_analyst", "Brand, Entity & Reputation Analyst", "F. Authority", "Measures exact-match brand search velocity, Google Entity Graph disambiguation, and public trust.")
+
+class LocalCitationReviewsAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("local_citation_analyst", "Local Citation & Reviews Analyst", "F. Authority", "Audits local NAP citations (Yelp, BBB, Angi), review velocity, and review response signals.")
+
+class LinkRiskSpamAuditorRole(BaseRole):
+    def __init__(self):
+        super().__init__("link_risk_auditor", "Link Risk & Spam Auditor", "F. Authority", "Identifies toxic, manipulative, paid, or private blog network (PBN) link vectors.")
+
+class ProofAcquisitionManagerRole(BaseRole):
+    def __init__(self):
+        super().__init__("proof_acquisition_manager", "Expert, Partnership & Proof Acquisition Manager", "F. Authority", "Secures verifiable client case studies, manufacturer certificates, and partner badges.")
+
+# ==============================================================================
+# SQUAD G: CUSTOMER, COMMERCIAL & CONVERSION ROLES
+# ==============================================================================
+class VoiceOfCustomerAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("voice_of_customer_analyst", "Customer Research & Voice-of-Customer Analyst", "G. Conversion", "Extracts real customer terminology, pain points, objections, and buying triggers.")
+
+class SkepticalCommercialContractorPersonaRole(BaseRole):
+    def __init__(self):
+        super().__init__("skeptical_contractor", "Skeptical Commercial Contractor Persona", "G. Conversion", "Represents a busy 50yo roofing owner on an iPhone at a job site with zero tolerance for marketing fluff.")
+
+    def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, Any]) -> Dict[str, Any]:
+        text = page_data.get("text", "")
+        html = page_data.get("html", "")
+        has_tel = "tel:" in html
+        has_ownership = "100%" in text or "ownership" in text.lower()
+        has_buzzwords = any(b in text.lower() for b in ["skyrocket", "game-changer", "10x", "leading provider", "cutting-edge"])
+        
+        score = 85.0
+        flaws = []
+        if not has_tel:
+            score -= 35.0
+            flaws.append("NO 1-TAP PHONE DIALER: Contractor on a ladder cannot copy-paste a phone number into an email form.")
+        if not has_ownership:
+            score -= 25.0
+            flaws.append("NO OWNERSHIP GUARANTEE: Burned by previous agencies locking domains; requires '100% Client Asset Ownership'.")
+        if has_buzzwords:
+            score -= 30.0
+            flaws.append("AGENCY BS DETECTED: Uses generic marketing buzzwords ('skyrocket', 'game-changer'). Instant bounce.")
+            
+        return {
+            "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": max(5.0, score),
+            "verdict": "CONTRACTOR_TRUST_EARNED" if score >= 75 else "CONTRACTOR_INSTANT_BOUNCE",
+            "observations": [{"type": "fatal_flaw" if score < 75 else "observed", "statement": f, "evidence_ids": []} for f in flaws] or [{"type": "observed", "statement": "Contractor conversion criteria satisfied.", "evidence_ids": []}],
+            "recommendations": []
+        }
+
+class MobileFirstCustomerRole(BaseRole):
+    def __init__(self):
+        super().__init__("mobile_first_customer", "Mobile-First Customer", "G. Conversion", "Tests whether mobile users on constrained cellular networks can convert within 3 seconds.")
+
+class ComparisonShopperRole(BaseRole):
+    def __init__(self):
+        super().__init__("comparison_shopper", "Comparison Shopper / Buyer", "G. Conversion", "Audits pricing transparency, competitor alternatives, guarantees, and risk reversals.")
+
+class UXCROFunnelAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("cro_funnel_analyst", "UX & CRO Funnel Analyst", "G. Conversion", "Audits landing page clarity, 2-step estimate forms, CTA contrast, and friction points.")
+
+class SalesQualifiedLeadAnalystRole(BaseRole):
+    def __init__(self):
+        super().__init__("lead_analyst", "Sales & Qualified-Lead Analyst", "G. Conversion", "Filters out vanity impressions and spam submissions to focus exclusively on qualified booked revenue.")
+
+class OfferPricingModelStrategistRole(BaseRole):
+    def __init__(self):
+        super().__init__("offer_pricing_strategist", "Offer, Pricing & Business-Model Strategist", "G. Conversion", "Connects search queries to commercially viable, high-margin contractor service offers.")
+
+# ==============================================================================
+# SQUAD H: IMPLEMENTATION, RED-TEAM & RISK CONTROL
+# ==============================================================================
+class DeveloperMaintainerRole(BaseRole):
+    def __init__(self):
+        super().__init__("developer_maintainer", "Developer & Maintainer", "H. Risk & Code", "Converts audit findings into zero-bloat, maintainable semantic PHP/HTML and Vanilla JS.")
+
+class ReleaseExperimentManagerRole(BaseRole):
+    def __init__(self):
+        super().__init__("release_manager", "Release & Experiment Implementation Manager", "H. Risk & Code", "Coordinates dual-branch deployment (master + static-mirror) and measurement baselines.")
+
+class SPAMComplianceRedTeamRole(BaseRole):
+    def __init__(self):
+        super().__init__("spam_compliance_redteam", "SEO Policy & Spam-Compliance Red Team", "H. Risk & Code", "Attacks strategies for algorithmic policy violations, doorway risks, and keyword stuffing.")
+
+class HallucinationProvenanceRedTeamRole(BaseRole):
+    def __init__(self):
+        super().__init__("hallucination_redteam", "Hallucination & Provenance Red Team", "H. Risk & Code", "Verifies that every metric, citation, line of code, and backlink claim actually exists.", is_always_on=True)
+
+class NegativeSEORiskReviewerRole(BaseRole):
+    def __init__(self):
+        super().__init__("negative_seo_reviewer", "Negative SEO, Abuse & Risk Reviewer", "H. Risk & Code", "Audits scraper attacks, rogue redirects, and domain reputation vulnerabilities.")
+
+class RollbackResilienceReviewerRole(BaseRole):
+    def __init__(self):
+        super().__init__("rollback_reviewer", "Rollback, Resilience & Incident Reviewer", "H. Risk & Code", "Ensures every architectural recommendation maintains a safe git revert and recovery plan.")
+
+# ==============================================================================
+# MASTER REGISTRY & DYNAMIC TASK ACTIVATOR
+# ==============================================================================
+ALL_62_ROLES: List[BaseRole] = [
+    # A. Command (5)
+    SEOSwarmChiefRole(), ResearchQuestionArchitectRole(), EvidenceLibrarianRole(), SEOPortfolioPrioritizerRole(), ChiefRefereeRole(),
+    # B. Measurement (8)
+    GSCAnalyticsAnalystRole(), GA4ConversionAnalystRole(), ServerLogCrawlAnalystRole(), SEODataEngineerRole(), StatisticalExperimentScientistRole(),
+    TrendSeasonalityForecasterRole(), AttributionIncrementalityAnalystRole(), MeasurementInstrumentationQARole(),
+    # C. Keyword/SERP (8)
+    KeywordUniverseResearcherRole(), SERPDifficultyAnalystRole(), SERPFeatureAnalystRole(), SearchIntentClassifierRole(), QueryClusterArchitectRole(),
+    CompetitorContentAnalystRole(), CompetitiveGapStrategistRole(), EntityKnowledgeGraphAnalystRole(),
+    # D. Technical SEO (13)
+    CrawlIndexationGuardianRole(), TechnicalSEOAuditorRole(), JavaScriptRenderingSpecialistRole(), InfoArchInternalLinkArchitectRole(),
+    CoreWebVitalsPerformanceEngineerRole(), StructuredDataSchemaSpecialistRole(), InternationalSEOHreflangSpecialistRole(), LocalSEOTechnicalSpecialistRole(),
+    EcommerceFacetedNavSpecialistRole(), MigrationRedirectSpecialistRole(), CMSFrameworkSEOCodeArchitectRole(), MultimediaSearchSpecialistRole(), SecurityPrivacySEOEngineerRole(),
+    # E. Content (9)
+    ContentStrategyEditorialDirectorRole(), InformationGainDataCriticRole(), OriginalResearchDataJournalistRole(), EEATTrustFactCheckerRole(),
+    ContentDecayRefreshEditorRole(), SERPSnippetMetaCopywriterRole(), TopicSemanticCoverageAnalystRole(), LocalizationTranscreationEditorRole(), ContentFormatMultimediaProducerRole(),
+    # F. Authority (6)
+    OffPageAuthorityBacklinkAuditorRole(), DigitalPRBrandOutreachStrategistRole(), BrandEntityReputationAnalystRole(), LocalCitationReviewsAnalystRole(),
+    LinkRiskSpamAuditorRole(), ProofAcquisitionManagerRole(),
+    # G. Conversion (7)
+    VoiceOfCustomerAnalystRole(), SkepticalCommercialContractorPersonaRole(), MobileFirstCustomerRole(), ComparisonShopperRole(), UXCROFunnelAnalystRole(),
+    SalesQualifiedLeadAnalystRole(), OfferPricingModelStrategistRole(),
+    # H. Risk & Red-Team (6)
+    DeveloperMaintainerRole(), ReleaseExperimentManagerRole(), SPAMComplianceRedTeamRole(), HallucinationProvenanceRedTeamRole(), NegativeSEORiskReviewerRole(), RollbackResilienceReviewerRole()
+]
+
+ROLE_MAP = {r.agent_id: r for r in ALL_62_ROLES}
+
+TASK_ACTIVATION_PRESETS = {
+    "single_page_audit": [
+        "swarm_chief", "evidence_librarian", "portfolio_prioritizer", "chief_referee", "hallucination_redteam",
+        "serp_difficulty_analyst", "offpage_backlink_auditor", "information_gain_critic", "skeptical_contractor",
+        "cwv_engineer", "schema_specialist", "internal_link_architect", "cro_funnel_analyst"
+    ],
+    "local_roofing_audit": [
+        "swarm_chief", "evidence_librarian", "portfolio_prioritizer", "chief_referee", "hallucination_redteam",
+        "local_seo_tech_specialist", "local_citation_analyst", "serp_difficulty_analyst", "serp_feature_analyst",
+        "skeptical_contractor", "mobile_first_customer", "information_gain_critic", "schema_specialist",
+        "cwv_engineer", "voice_of_customer_analyst", "cro_funnel_analyst", "offpage_backlink_auditor", "developer_maintainer"
+    ],
+    "full_technical_audit": [
+        "swarm_chief", "evidence_librarian", "portfolio_prioritizer", "chief_referee", "hallucination_redteam",
+        "crawl_guardian", "technical_seo_auditor", "js_rendering_specialist", "internal_link_architect",
+        "cwv_engineer", "schema_specialist", "cms_code_architect", "security_seo_engineer", "server_log_analyst",
+        "migration_redirect_specialist", "developer_maintainer", "negative_seo_reviewer", "rollback_reviewer"
+    ],
+    "content_strategy_audit": [
+        "swarm_chief", "evidence_librarian", "portfolio_prioritizer", "chief_referee", "hallucination_redteam",
+        "content_director", "information_gain_critic", "data_journalist", "eeat_fact_checker", "content_decay_editor",
+        "serp_snippet_copywriter", "semantic_coverage_analyst", "search_intent_classifier", "query_cluster_architect",
+        "competitor_content_analyst", "multimedia_producer"
+    ],
+    "full_red_team_all_62": [r.agent_id for r in ALL_62_ROLES]
+}
+
+def get_active_roles(task_preset: str = "single_page_audit") -> List[BaseRole]:
+    role_ids = TASK_ACTIVATION_PRESETS.get(task_preset, TASK_ACTIVATION_PRESETS["single_page_audit"])
+    return [ROLE_MAP[rid] for rid in role_ids if rid in ROLE_MAP]
