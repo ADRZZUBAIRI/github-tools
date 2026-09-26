@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "seo-swarm-simulator"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="WebSmitherz Systems Engineering", email="sales@websmitherz.com" },
 ]
-description = "Hardware-safe 62-role adversarial multi-agent SEO swarm simulation engine that models Google ranking reality and commercial conversion friction."
+description = "Adversarial 62-role multi-agent SEO swarm simulation engine with GSC acquisition gating, reality caps, and commercial conversion diagnostics."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

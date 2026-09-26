@@ -1,91 +1,90 @@
 """
-Comprehensive Multi-Page Brutal Audit Runner for WebSmitherz
-=============================================================
-Runs the 8-persona adversarial reality swarm across all critical clusters:
-- Core Money Pages (Homepage, Services)
-- Local Geo Landing Pages (Texas expansion hubs)
-- High-Traffic Blog / Pillar Guides
-- Free Interactive Engineering Tools
+Comprehensive Multi-Page Adversarial Swarm Audit Runner
+========================================================
+Runs the 62-role adversarial swarm engine across key strategic pages and clusters:
+- Core Services (National / Umbrella)
+- Local Geo Expansion Hubs
+- Technical Authority Pillar Blogs
+- Interactive Tools & Calculators
 
-Outputs summary tables, structural fatal flaws, and actionable mathematical fixes.
+Outputs summary tables, structural fatal flaws, and actionable mathematical reality caps.
 """
 
 import os
 import sys
 import glob
 import json
+import re
+import argparse
 from collections import defaultdict
+from typing import List, Tuple
 
 # Add src to path
-sys.path.insert(0, os.path.abspath("src"))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "src")))
 
-from seo_swarm.cli import run_swarm_audit
+from seo_swarm.roles.roster import ALL_62_ROLES, get_active_roles, TASK_ACTIVATION_PRESETS
+from seo_swarm.ingest.gsc_ingest import GSCDataIngestor
+from seo_swarm.analysis.decision_gate import apply_hard_reality_caps
 from seo_swarm.store.database import init_db, store_run, store_evidence, store_evaluation
-from seo_swarm.roles.roster import (
-    SERPExecutionerRole,
-    BacklinkDebtCollectorRole,
-    InformationGainTribunalRole,
-    SkepticalBlueCollarCFORole,
-    CoreWebVitalsTerminatorRole,
-    SchemaEntityProsecutorRole,
-    CompetitorPredatorRole,
-    AdversarialRefereeRole
-)
 
-# Define Key Strategic Pages Across Different Clusters
-KEY_PAGES = [
+DEFAULT_KEY_PAGES: List[Tuple[str, str]] = [
     # 1. Core National / Umbrella Services
-    ("Core", "c:/WebSmitherz/websmitherz/index.php"),
-    ("Core", "c:/WebSmitherz/websmitherz/pages/services/roofing-seo.php"),
-    ("Core", "c:/WebSmitherz/websmitherz/pages/services/gmb-local-seo.php"),
-    ("Core", "c:/WebSmitherz/websmitherz/pages/services/hvac-seo.php"),
-    ("Core", "c:/WebSmitherz/websmitherz/pages/services/custom-software.php"),
+    ("Core", "index.php"),
+    ("Core", "pages/services/roofing-seo.php"),
+    ("Core", "pages/services/gmb-local-seo.php"),
+    ("Core", "pages/services/hvac-seo.php"),
+    ("Core", "pages/services/custom-software.php"),
     
     # 2. Local Texas Expansion Hubs (Striking Distance Focus)
-    ("Local Geo", "c:/WebSmitherz/websmitherz/pages/local/roofing-seo-tyler-tx.php"),
-    ("Local Geo", "c:/WebSmitherz/websmitherz/pages/local/roofing-seo-waco-tx.php"),
-    ("Local Geo", "c:/WebSmitherz/websmitherz/pages/local/roofing-seo-sugar-land-tx.php"),
-    ("Local Geo", "c:/WebSmitherz/websmitherz/pages/local/roofing-seo-the-woodlands-tx.php"),
-    ("Local Geo", "c:/WebSmitherz/websmitherz/pages/local/roofing-seo-katy-tx.php"),
+    ("Local Geo", "pages/local/roofing-seo-tyler-tx.php"),
+    ("Local Geo", "pages/local/roofing-seo-waco-tx.php"),
+    ("Local Geo", "pages/local/roofing-seo-sugar-land-tx.php"),
+    ("Local Geo", "pages/local/roofing-seo-the-woodlands-tx.php"),
+    ("Local Geo", "pages/local/roofing-seo-katy-tx.php"),
     
     # 3. Technical Authority Pillar Blogs
-    ("Pillar Blog", "c:/WebSmitherz/websmitherz/pages/resources/blog/contractor-crm-webhook-integration-guide.php"),
-    ("Pillar Blog", "c:/WebSmitherz/websmitherz/pages/resources/blog/replace-elementor-with-custom-gutenberg-blocks.php"),
-    ("Pillar Blog", "c:/WebSmitherz/websmitherz/pages/resources/blog/how-to-rank-google-maps.php"),
-    ("Pillar Blog", "c:/WebSmitherz/websmitherz/pages/resources/seo/roofing-seo-guide.php"),
+    ("Pillar Blog", "pages/resources/blog/contractor-crm-webhook-integration-guide.php"),
+    ("Pillar Blog", "pages/resources/blog/replace-elementor-with-custom-gutenberg-blocks.php"),
+    ("Pillar Blog", "pages/resources/blog/how-to-rank-google-maps.php"),
+    ("Pillar Blog", "pages/resources/seo/roofing-seo-guide.php"),
     
     # 4. Interactive Tools & Calculators
-    ("Tools", "c:/WebSmitherz/websmitherz/pages/tools/contractor-schema-generator.php"),
-    ("Tools", "c:/WebSmitherz/websmitherz/pages/tools/local-seo-grader.php"),
-    ("Tools", "c:/WebSmitherz/websmitherz/pages/tools/mobile-speed-cro-analyzer.php"),
+    ("Tools", "pages/tools/contractor-schema-generator.php"),
+    ("Tools", "pages/tools/local-seo-grader.php"),
+    ("Tools", "pages/tools/mobile-speed-cro-analyzer.php"),
 ]
 
-def execute_multi_cluster_audit():
-    analyst_roles = [
-        SERPExecutionerRole(),
-        BacklinkDebtCollectorRole(),
-        InformationGainTribunalRole(),
-        SkepticalBlueCollarCFORole(),
-        CoreWebVitalsTerminatorRole(),
-        SchemaEntityProsecutorRole(),
-        CompetitorPredatorRole()
-    ]
-    referee = AdversarialRefereeRole()
+def execute_multi_cluster_audit(root_dir: str, gsc_dir: str = None, authority_file: str = None, preset: str = "single_page_audit"):
+    gsc_ingestor = GSCDataIngestor(gsc_dir) if gsc_dir else GSCDataIngestor(None)
+    site_gsc = gsc_ingestor.get_site_metrics()
     
+    authority_data = {"status": "UNKNOWN", "referring_domains": 0, "domain_authority": 0}
+    if authority_file and os.path.exists(authority_file):
+        try:
+            with open(authority_file, "r", encoding="utf-8") as af:
+                authority_data = json.load(af)
+                authority_data["status"] = "VERIFIED"
+        except Exception:
+            pass
+
+    active_roles = get_active_roles(preset)
     results_by_cluster = defaultdict(list)
     overall_flaws = []
     
     print("=" * 90)
-    print("               WEBSMITHERZ SITE-WIDE ADVERSARIAL REALITY AUDIT")
-    print("               (Testing 16 High-Priority Production Pages Across 4 Clusters)")
+    print("               SITE-WIDE ADVERSARIAL REALITY CLUSTER AUDIT")
+    print(f"  Root Dir      : {root_dir}")
+    print(f"  GSC Ingestion : {'Active (' + str(site_gsc['complete_days']) + ' days: ' + str(site_gsc['total_impressions']) + ' impr, ' + str(site_gsc['total_clicks']) + ' clicks)' if site_gsc['is_active'] else 'Not Loaded (Score Capped at 20/100)'}")
+    print(f"  Authority     : {authority_data['status']}")
+    print(f"  Task Preset   : [{preset.upper()}] ({len(active_roles)} active roles)")
     print("=" * 90 + "\n")
     
-    for cluster, file_path in KEY_PAGES:
+    for cluster, rel_path in DEFAULT_KEY_PAGES:
+        file_path = os.path.join(root_dir, rel_path)
         if not os.path.exists(file_path):
-            print(f"[!] Warning: File {file_path} not found.")
             continue
             
-        with open(file_path, "r", encoding="utf-8") as f:
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             html = f.read()
             
         title_m = re.search(r'\$page_title\s*=\s*["\']([^"\']+)["\']|<title>([^<]+)</title>', html, re.IGNORECASE)
@@ -101,61 +100,66 @@ def execute_multi_cluster_audit():
             "text": clean_text
         }
         
+        page_gsc = gsc_ingestor.get_page_metrics(file_path) if site_gsc["is_active"] else None
         evidence_map = {
             "EVD-TITLE": title,
             "EVD-SCHEMA": "application/ld+json" in html,
-            "EVD-TEL": "tel:" in html
+            "EVD-TEL": "tel:" in html,
+            "EVD-SECTIONS": str(len(re.findall(r'<section\b', html, re.IGNORECASE))),
+            "EVD-AUTHORITY": authority_data
         }
-        
+        if site_gsc["is_active"]:
+            evidence_map["EVD-GSC-SITE"] = site_gsc
+        if page_gsc:
+            evidence_map["EVD-GSC-PAGE"] = page_gsc
+            
         evaluations = []
-        for role in analyst_roles:
+        for role in active_roles:
             res = role.evaluate(page_data, evidence_map)
             evaluations.append(res)
             
-        verdict = referee.evaluate_swarm(evaluations)
+        scored_evals = [e for e in evaluations if e["status"] == "complete" and e["agent_id"] not in ["swarm_chief", "evidence_librarian", "portfolio_prioritizer", "chief_referee", "hallucination_redteam"]]
+        raw_avg = round(sum(e["score"] for e in scored_evals) / len(scored_evals), 1) if scored_evals else 0.0
         
-        rel_path = file_path.replace("c:/WebSmitherz/websmitherz/", "")
+        is_national = ("roofing seo" in title.lower() or "seo services" in title.lower()) and not any(c in title.lower() for c in ["tyler", "waco", "san angelo", "macon", "clarksville", "midland", "odessa", "katy", "woodlands", "sugar land"])
+        commercial_data = {"has_tap_to_call": "tel:" in html, "has_ownership_guarantee": ("100%" in clean_text or "ownership" in clean_text.lower())}
+        
+        gate_decision = apply_hard_reality_caps(
+            raw_score=raw_avg,
+            gsc_metrics=site_gsc,
+            page_metrics=page_gsc,
+            authority_data=authority_data,
+            commercial_data=commercial_data,
+            is_national_target=is_national
+        )
+        
         results_by_cluster[cluster].append({
             "path": rel_path,
-            "title": title[:45] + "..." if len(title) > 45 else title,
-            "score": verdict["composite_reality_score"],
-            "depression": verdict["depression_index"],
-            "consensus": verdict["consensus"],
-            "flaws": verdict["fatal_flaws"]
+            "title": title[:42] + "..." if len(title) > 42 else title,
+            "raw_score": raw_avg,
+            "final_score": gate_decision["final_capped_score"],
+            "verdict": gate_decision["verdict"]
         })
-        for f in verdict["fatal_flaws"]:
-            overall_flaws.append((cluster, rel_path, f))
-            
+        
     # Print Tabular Results by Cluster
     for cluster, rows in results_by_cluster.items():
         print(f"\n--- CLUSTER: {cluster.upper()} ---")
-        print(f"{'Page Route':<45} | {'Score':<6} | {'Consensus Verdict':<32}")
-        print("-" * 90)
+        print(f"{'Page Route':<45} | {'Raw':<5} | {'Final':<5} | {'Consensus Verdict':<32}")
+        print("-" * 96)
         for r in rows:
-            print(f"{r['path']:<45} | {r['score']:<6} | {r['consensus']:<32}")
+            print(f"{r['path']:<45} | {r['raw_score']:<5.1f} | {r['final_score']:<5.1f} | {r['verdict']:<32}")
             
-    print("\n" + "=" * 90)
-    print("                    CRITICAL STRATEGIC PATTERNS DISCOVERED")
-    print("=" * 90)
+    print("\n" + "=" * 90 + "\n")
+
+def main():
+    parser = argparse.ArgumentParser(description="Run Multi-Cluster SEO Swarm Reality Audit")
+    parser.add_argument("--root", default=r"c:\WebSmitherz\websmitherz", help="Root directory of the website")
+    parser.add_argument("--gsc-dir", default=None, help="GSC export directory")
+    parser.add_argument("--authority-file", default=None, help="Authority profile JSON")
+    parser.add_argument("--preset", default="single_page_audit", choices=list(TASK_ACTIVATION_PRESETS.keys()))
+    args = parser.parse_args()
     
-    print("\n1. WHY CORE SERVICES FAIL (Average Score: ~50-55/100):")
-    print("   - Targeting national KD 70-85 terms on a low-DA domain.")
-    print("   - 0 Referring domains from trade organizations = Google leaves them on Page 7-9 (Positions 60-90).")
-    print("   - High technical performance (Sub-0.8s) is completely wasted because nobody ever reaches the page.")
-
-    print("\n2. WHY LOCAL HUBS SURVIVE (Average Score: ~75-80/100):")
-    print("   - Proximity and Google Business Profile algorithms allow DA 2 sites to reach Top 3 locally.")
-    print("   - Local intent avoids multi-million dollar national aggregators.")
-    print("   - MISSING FIX: Need to inject interactive local loss widgets and 100% asset ownership guarantees into every suburban page.")
-
-    print("\n3. WHY PILLAR BLOGS ARE STUCK (Average Score: ~55-65/100):")
-    print("   - Explaining 'why local SEO matters' triggers Google's Information Gain penalty (AI Overviews steals the answer).")
-    print("   - MUST PIVOT to proprietary developer teardowns (e.g. 'Auditing 340 Texas Roofing Sites', CRM Webhook code).")
-
-    print("\n4. WHY TOOLS HAVE THE HIGHEST CONVERSION POWER (Average Score: ~85/100):")
-    print("   - Interactive utilities generate immediate value and earn natural backlinks from other sites.")
-    print("=" * 90 + "\n")
+    execute_multi_cluster_audit(args.root, args.gsc_dir, args.authority_file, args.preset)
 
 if __name__ == "__main__":
-    import re
-    execute_multi_cluster_audit()
+    main()
