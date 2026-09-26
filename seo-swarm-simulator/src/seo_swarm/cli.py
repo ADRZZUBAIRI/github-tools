@@ -18,36 +18,35 @@ from seo_swarm.ingest.gsc_ingest import GSCDataIngestor
 from seo_swarm.analysis.decision_gate import apply_hard_reality_caps
 from seo_swarm.config.profile import load_project_profile
 from seo_swarm.adapters.codebase import extract_page_primitives
+from seo_swarm.adapters.authority import validate_authority_data
+from seo_swarm.adapters.serp import load_serp_snapshot
 
 def run_swarm_audit(
     target_file_path: str,
     task_preset: str = "single_page_audit",
     profile_name_or_path: str = "generic",
     gsc_dir: Optional[str] = None,
-    authority_file: Optional[str] = None
+    authority_file: Optional[str] = None,
+    serp_file: Optional[str] = None
 ):
     if not os.path.exists(target_file_path):
         print(f"[!] Error: Target file '{target_file_path}' does not exist.")
         return
 
     profile = load_project_profile(profile_name_or_path)
-    page_data = extract_page_primitives(target_file_path)
+    site_url = profile.get("site_url", "https://example.com")
+    page_data = extract_page_primitives(target_file_path, site_url=site_url)
 
     # Ingest verified GSC data (if provided)
-    gsc_ingestor = GSCDataIngestor(gsc_dir) if gsc_dir else GSCDataIngestor(None)
+    gsc_ingestor = GSCDataIngestor(gsc_dir, expected_site_url=site_url) if gsc_dir else GSCDataIngestor(None)
     site_gsc = gsc_ingestor.get_site_metrics()
-    page_gsc = gsc_ingestor.get_page_metrics(target_file_path) if site_gsc["is_active"] else None
+    page_gsc = gsc_ingestor.get_page_metrics(target_file_path, page_route=page_data.get("route")) if site_gsc["is_active"] else None
 
-    # Authority Data Handling: Default to UNKNOWN unless verified provider is supplied
-    authority_data = {"status": "UNKNOWN", "referring_domains": 0, "domain_authority": 0}
-    if authority_file and os.path.exists(authority_file):
-        try:
-            import json
-            with open(authority_file, "r", encoding="utf-8") as af:
-                authority_data = json.load(af)
-                authority_data["status"] = "VERIFIED"
-        except Exception:
-            authority_data = {"status": "UNKNOWN", "referring_domains": 0, "domain_authority": 0}
+    # Authority Data Handling: Strict validation via Authority Adapter
+    authority_data = validate_authority_data(authority_file, expected_site_url=site_url)
+    
+    # SERP Snapshot Handling
+    serp_data = load_serp_snapshot(serp_file)
 
     active_roles = get_active_roles(task_preset, profile=profile)
     run_id = f"RUN-{uuid.uuid4().hex[:8].upper()}"
@@ -65,12 +64,15 @@ def run_swarm_audit(
         "EVD-SECTIONS": str(len(re.findall(r'<(?:section|article|div\s+class=[\'"][^\'"]*(?:container|section|wrapper)[^\'"]*)', html_content, re.IGNORECASE))),
         "EVD-AUTHORITY": authority_data,
         "EVD-PROFILE": profile,
-        "EVD-FRAMEWORK": page_data.get("framework", "generic")
+        "EVD-FRAMEWORK": page_data.get("framework", "generic"),
+        "EVD-PAGE-PRIMITIVES": page_data
     }
     if site_gsc["is_active"]:
         evidence_map["EVD-GSC-SITE"] = site_gsc
     if page_gsc:
         evidence_map["EVD-GSC-PAGE"] = page_gsc
+    if serp_data:
+        evidence_map["EVD-SERP-COMPETITORS"] = serp_data
 
     for k, v in evidence_map.items():
         store_evidence(conn, run_id, k, "source_inspection", target_file_path, "1-end", str(v), {"value": v})
@@ -80,12 +82,13 @@ def run_swarm_audit(
     print(" " * 20 + "62-ROLE ADVERSARIAL SEO SWARM ENGINE")
     print(" " * 18 + f"Preset: [{task_preset.upper()}] | Profile: [{profile['profile_id']}]")
     print("#" * 88)
-    print(f" Target File  : {target_file_path} (Framework: {page_data.get('framework')})")
+    print(f" Target File  : {target_file_path} (Route: {page_data.get('route')} | Framework: {page_data.get('framework')})")
     if site_gsc['is_active']:
         print(f" GSC Ingestion: Active ({site_gsc['complete_days']} days: {site_gsc['total_impressions']} impr, {site_gsc['total_clicks']} clicks across {site_gsc['tracked_pages_count']} pages)")
     else:
         print(f" GSC Ingestion: Not Loaded (Organic search metrics UNKNOWN)")
-    print(f" Authority    : {authority_data['status']} ({authority_data.get('referring_domains', 0)} ref domains)")
+    print(f" Authority    : {authority_data['status']} ({authority_data.get('referring_domains', 0)} ref domains via {authority_data.get('provider', 'none')})")
+    print(f" SERP Data    : {'Verified (' + str(serp_data['target_query']) + ' | KD ' + str(serp_data['keyword_difficulty']) + ')' if serp_data else 'Provisional (No SERP snapshot)'}")
     print(f" Industry/Pack: {profile.get('industry', 'generic')} (Scope: {profile.get('target_scope', 'national')})")
     print(f" Run ID       : {run_id} | Mode: Uninflated Reality Execution")
     print("#" * 88 + "\n")
@@ -178,12 +181,13 @@ def main():
     parser = argparse.ArgumentParser(description="Run 62-Role Generic SEO Swarm Simulator")
     parser.add_argument("target", nargs="?", default="index.html", help="Path to target page, template or markup file")
     parser.add_argument("--preset", default="single_page_audit", choices=list(TASK_ACTIVATION_PRESETS.keys()))
-    parser.add_argument("--profile", default="generic", help="Industry profile pack ('generic', 'saas', 'local_services' or path to profile.json)")
+    parser.add_argument("--profile", default="generic", help="Industry profile pack ('generic', 'saas', 'local_services' or path to profile.json/yaml)")
     parser.add_argument("--gsc-dir", default=None, help="Directory containing GSC CSV exports (Pages.csv, Chart.csv, etc.)")
-    parser.add_argument("--authority-file", default=None, help="JSON file containing verified referring_domains and domain_authority")
+    parser.add_argument("--authority-file", default=None, help="Validated JSON/CSV file containing referring_domains, domain_authority, and domain name")
+    parser.add_argument("--serp-file", default=None, help="JSON file containing competitive SERP snapshot (target_query, keyword_difficulty, top_competitors)")
     args = parser.parse_args()
     
-    run_swarm_audit(args.target, args.preset, args.profile, args.gsc_dir, args.authority_file)
+    run_swarm_audit(args.target, args.preset, args.profile, args.gsc_dir, args.authority_file, args.serp_file)
 
 if __name__ == "__main__":
     main()

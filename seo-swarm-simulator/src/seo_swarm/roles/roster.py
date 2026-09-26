@@ -6,7 +6,7 @@ Rules:
 2. Implemented roles perform real heuristics on HTML/DOM, Evidence Objects, GSC Data, and Authority Profiles.
 3. Every evidence citation must exist in the evidence map.
 4. When external evidence (GSC, Authority, SERP) is missing, roles must report status='insufficient_evidence' rather than asserting zero metrics or pass.
-5. Dynamic activation integrates industry/domain profile personas (e.g. SaaS vs Local Trades vs Generic).
+5. Information gain demands genuine interactive calculation widgets or empirical datasets with explicit code binding.
 """
 
 import re
@@ -51,8 +51,10 @@ class EvidenceLibrarianRole(BaseRole):
     def __init__(self):
         super().__init__("evidence_librarian", "Evidence & Provenance Librarian", "A. Command", "Tracks every fact and confidence level.", is_always_on=True, is_implemented=True)
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, Any]) -> Dict[str, Any]:
-        ev_count = len(evidence_map)
-        return {"agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 100.0 if ev_count >= 3 else 50.0, "verdict": "PROVENANCE_VERIFIED", "observations": [{"type": "observed", "statement": f"Tracked {ev_count} verified evidence primitives.", "evidence_ids": list(evidence_map.keys())}], "recommendations": []}
+        verified_ev = [k for k, v in evidence_map.items() if v and not (isinstance(v, dict) and v.get("status") == "UNKNOWN")]
+        ev_count = len(verified_ev)
+        score = 100.0 if ev_count >= 4 else (60.0 if ev_count >= 2 else 30.0)
+        return {"agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": score, "verdict": "PROVENANCE_VERIFIED" if score >= 80 else "PARTIAL_PROVENANCE", "observations": [{"type": "observed" if score >= 80 else "info", "statement": f"Tracked {ev_count} verified evidence primitives ({len(evidence_map)} total keys bound).", "evidence_ids": list(evidence_map.keys())}], "recommendations": []}
 
 class SEOPortfolioPrioritizerRole(BaseRole):
     def __init__(self):
@@ -160,25 +162,50 @@ class SERPDifficultyAnalystRole(BaseRole):
         profile = evidence_map.get("EVD-PROFILE", {})
         target_locations = profile.get("target_locations", [])
         
-        if not serp_data:
-            has_geo = any(loc.lower() in title or loc.lower() in url for loc in target_locations)
-            is_broad_national = any(term in title for term in ["seo", "web design", "software", "agency", "crm", "platform"]) and not has_geo
+        # When a verified SERP snapshot dataset is loaded
+        if serp_data and serp_data.get("is_verified"):
+            kd = serp_data.get("keyword_difficulty", 50)
+            target_query = serp_data.get("target_query", "")
+            auth = evidence_map.get("EVD-AUTHORITY", {})
+            da = auth.get("domain_authority", 0) if auth.get("status") == "VERIFIED" else 0
             
-            if is_broad_national and profile.get("target_scope") != "local":
-                return {
-                    "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 15.0, "verdict": "HIGH_NATIONAL_KD_RISK",
-                    "observations": [{"type": "fatal_flaw", "statement": "UNVERIFIED SERP: Page title targets competitive national query without verified domain equity. High Page 9 displacement risk.", "evidence_ids": ["EVD-TITLE"]}],
-                    "recommendations": [{"title": "Target Long-Tail or Product Integrations", "action": "Narrow targeting to high-intent long-tail modifiers or exact software integrations.", "benefit": "critical", "effort": 2, "risk": 1}]
-                }
+            # Mathematical KD vs DA reality calculation
+            if kd > 60 and da < 20:
+                score = 15.0
+                verdict = "SUICIDAL_COMPETITION_GAP"
+                flaw_type = "fatal_flaw"
+                obs = f"SERP EVIDENCE: Target query '{target_query}' has KD {kd} vs domain DA {da}. Mathematical probability of top 5 ranking is near zero without significant link equity."
+            elif kd <= 35 or da >= 40:
+                score = 90.0
+                verdict = "STRIKING_DISTANCE_COMPETITIVE"
+                flaw_type = "observed"
+                obs = f"SERP EVIDENCE: Target query '{target_query}' (KD {kd}) is within striking distance of domain authority (DA {da})."
+            else:
+                score = 60.0
+                verdict = "MODERATE_SERP_COMPETITION"
+                flaw_type = "observed"
+                obs = f"SERP EVIDENCE: Target query '{target_query}' (KD {kd}) requires targeted link acquisition and entity signals."
+                
             return {
-                "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 50.0, "verdict": "ESTIMATED_STRIKING_DISTANCE",
-                "observations": [{"type": "info", "statement": "Targeting aligned with profile scope. Note: KD is ESTIMATED pending live SERP competitor snapshot.", "evidence_ids": ["EVD-TITLE"]}],
-                "recommendations": []
+                "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": score, "verdict": verdict,
+                "observations": [{"type": flaw_type, "statement": obs, "evidence_ids": ["EVD-SERP-COMPETITORS"]}],
+                "recommendations": [{"title": "Target Long-Tail or CRM Integrations", "action": "Target low-KD long-tail variants to build initial authority.", "benefit": "critical", "effort": 2, "risk": 1}] if score < 50 else []
             }
         
+        # Provisional evaluation when no SERP snapshot is provided
+        has_geo = any(loc.lower() in title or loc.lower() in url for loc in target_locations)
+        is_broad_national = any(term in title for term in ["seo", "web design", "software", "agency", "crm", "platform"]) and not has_geo
+        
+        if is_broad_national and profile.get("target_scope") != "local":
+            return {
+                "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 20.0, "verdict": "PROVISIONAL_NATIONAL_KD_RISK",
+                "observations": [{"type": "fatal_flaw", "statement": "PROVISIONAL SERP: No competitor snapshot provided (--serp-file). Title indicates broad national targeting prone to top-10 incumbent displacement.", "evidence_ids": ["EVD-TITLE"]}],
+                "recommendations": [{"title": "Supply Competitive SERP Snapshot", "action": "Pass --serp-file with verified KD and top-10 competitor URLs.", "benefit": "high", "effort": 1, "risk": 0}]
+            }
+            
         return {
-            "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 85.0, "verdict": "SERP_EVIDENCE_VALIDATED",
-            "observations": [{"type": "observed", "statement": "Live SERP snapshot integrated and evaluated.", "evidence_ids": ["EVD-SERP-COMPETITORS"]}],
+            "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 50.0, "verdict": "PROVISIONAL_TARGET_ESTIMATE",
+            "observations": [{"type": "info", "statement": "KD is PROVISIONAL (no --serp-file supplied). Target scope aligns with profile defaults.", "evidence_ids": ["EVD-TITLE"]}],
             "recommendations": []
         }
 
@@ -324,13 +351,27 @@ class InformationGainDataCriticRole(BaseRole):
 
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, Any]) -> Dict[str, Any]:
         html = page_data.get("html", "")
-        text = page_data.get("text", "")
-        has_tool = "<script" in html and any(t in text.lower() for t in ["calculator", "widget", "demo", "analyzer", "estimator", "benchmark", "playground"])
-        has_empirical = any(m in text.lower() for m in ["benchmark", "telemetry", "ms", "api", "sub-0.8s", "data", "results", "case study"])
+        # Require concrete functional implementation: actual script tags containing calculation functions or structured table benchmarks
+        has_interactive_code = bool(re.search(r'<script\b[^>]*>.*?(?:function\s+\w+|const\s+\w+\s*=|let\s+\w+\s*=|var\s+\w+\s*=).*?(?:calculate|estimate|compute|audit|score|analyze|compare|cost|loss|metric)', html, re.DOTALL | re.IGNORECASE))
+        has_data_tables = len(re.findall(r'<table\b', html, re.IGNORECASE)) >= 1 and len(re.findall(r'<tr\b', html, re.IGNORECASE)) >= 4
+        has_code_demonstration = len(re.findall(r'<(?:pre|code)\b', html, re.IGNORECASE)) >= 2
         
-        if has_tool or has_empirical:
-            return {"agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 90.0, "verdict": "INFORMATION_GAIN_CONFIRMED", "observations": [{"type": "observed", "statement": "Proprietary utility or empirical data satisfies Information Gain requirements.", "evidence_ids": []}], "recommendations": []}
-        return {"agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": 25.0, "verdict": "DERIVATIVE_CONTENT_RISK", "observations": [{"type": "fatal_flaw", "statement": "LOW INFORMATION GAIN: Content contains mainly generic descriptive text without proprietary calculators or verified empirical datasets.", "evidence_ids": []}], "recommendations": [{"title": "Embed Interactive Utility / Original Data", "action": "Provide interactive calculation tools or original benchmark data.", "benefit": "critical", "effort": 2, "risk": 1}]}
+        if has_interactive_code or has_data_tables or has_code_demonstration:
+            score = 90.0
+            verdict = "INFORMATION_GAIN_CONFIRMED"
+            obs = "Proprietary interactive calculation code, comparative data tables, or structured implementation code verified."
+            flaw_type = "observed"
+        else:
+            score = 25.0
+            verdict = "DERIVATIVE_CONTENT_RISK"
+            obs = "LOW INFORMATION GAIN: Page contains purely static narrative text without interactive calculation utilities, structured benchmark tables, or functional code demonstrations."
+            flaw_type = "fatal_flaw"
+            
+        return {
+            "agent_id": self.agent_id, "role": self.title, "squad": self.squad, "status": "complete", "score": score, "verdict": verdict,
+            "observations": [{"type": flaw_type, "statement": obs, "evidence_ids": []}],
+            "recommendations": [{"title": "Embed Interactive Utility or Empirical Tables", "action": "Provide interactive calculation tools, empirical benchmark matrices, or concrete code snippets.", "benefit": "critical", "effort": 2, "risk": 1}] if score < 50 else []
+        }
 
 class OriginalResearchDataJournalistRole(BaseRole):
     def __init__(self):
@@ -375,7 +416,7 @@ class OffPageAuthorityBacklinkAuditorRole(BaseRole):
 
     def evaluate(self, page_data: Dict[str, Any], evidence_map: Dict[str, Any]) -> Dict[str, Any]:
         auth_data = evidence_map.get("EVD-AUTHORITY")
-        if not auth_data or auth_data.get("status") == "UNKNOWN":
+        if not auth_data or auth_data.get("status") != "VERIFIED":
             return {
                 "agent_id": self.agent_id,
                 "role": self.title,
@@ -383,7 +424,7 @@ class OffPageAuthorityBacklinkAuditorRole(BaseRole):
                 "status": "insufficient_evidence",
                 "score": 0.0,
                 "verdict": "AUTHORITY_DATA_UNVERIFIED",
-                "observations": [{"type": "info", "statement": "No external backlink dataset (Ahrefs/Moz/GSC links) loaded. Authority status is UNKNOWN.", "evidence_ids": []}],
+                "observations": [{"type": "info", "statement": f"No verified backlink dataset loaded ({auth_data.get('provider', 'none')}). Authority status is UNKNOWN.", "evidence_ids": []}],
                 "recommendations": [{"title": "Connect Backlink Provider", "action": "Feed verified referring domain counts to validate domain equity.", "benefit": "high", "effort": 2, "risk": 0}]
             }
         
@@ -397,7 +438,7 @@ class OffPageAuthorityBacklinkAuditorRole(BaseRole):
             "status": "complete",
             "score": score,
             "verdict": "AUTHORITY_VERIFIED" if score >= 70 else "BACKLINK_DEBT",
-            "observations": [{"type": "observed" if score >= 70 else "fatal_flaw", "statement": f"Verified Authority Profile: DA {da}, {rd} Referring Domains.", "evidence_ids": ["EVD-AUTHORITY"]}],
+            "observations": [{"type": "observed" if score >= 70 else "fatal_flaw", "statement": f"Verified Authority Profile ({auth_data.get('provider')}): DA {da}, {rd} Referring Domains.", "evidence_ids": ["EVD-AUTHORITY"]}],
             "recommendations": []
         }
 
@@ -521,7 +562,7 @@ class HallucinationProvenanceRedTeamRole(BaseRole):
         missing_evidence = []
         if "EVD-GSC-SITE" not in evidence_map:
             missing_evidence.append("GSC site performance dataset missing")
-        if "EVD-AUTHORITY" not in evidence_map or evidence_map["EVD-AUTHORITY"].get("status") == "UNKNOWN":
+        if "EVD-AUTHORITY" not in evidence_map or evidence_map["EVD-AUTHORITY"].get("status") != "VERIFIED":
             missing_evidence.append("Backlink authority dataset unverified")
             
         score = 100.0 if not missing_evidence else (60.0 if len(missing_evidence) == 1 else 30.0)
@@ -599,7 +640,6 @@ TASK_ACTIVATION_PRESETS = {
 def get_active_roles(task_preset: str = "single_page_audit", profile: Optional[Dict[str, Any]] = None) -> List[BaseRole]:
     role_ids = list(TASK_ACTIVATION_PRESETS.get(task_preset, TASK_ACTIVATION_PRESETS["single_page_audit"]))
     
-    # Dynamically append profile-specific personas
     if profile:
         for persona_id in profile.get("active_personas", []):
             if persona_id in ROLE_MAP and persona_id not in role_ids:

@@ -4,13 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "seo-swarm-simulator"
-version = "1.0.1"
-authors = [
-  { name="WebSmitherz Systems Engineering", email="sales@websmitherz.com" },
-]
-description = "Adversarial 62-role multi-agent SEO swarm simulation engine with GSC acquisition gating, reality caps, and commercial conversion diagnostics."
+version = "1.0.2"
+description = "Universal 62-role adversarial multi-agent SEO swarm simulation engine with GSC acquisition gating, verified KD/DA reality caps, and framework-agnostic adapters."
 readme = "README.md"
 requires-python = ">=3.8"
+license = { text = "MIT" }
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -19,13 +17,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 keywords = ["seo", "multi-agent", "swarm-intelligence", "google-rankbrain", "navboost", "ai-overviews", "information-gain", "core-web-vitals"]
-
-[project.urls]
-"Homepage" = "https://websmitherz.com"
-"Schema Generator" = "https://websmitherz.com/tools/contractor-schema-generator"
-"Contractor SEO Playbook" = "https://websmitherz.com/services/roofing-seo"
-"Bug Tracker" = "https://github.com/ADRZZUBAIRI/github-tools/issues"
-"Source" = "https://github.com/ADRZZUBAIRI/github-tools/tree/master/seo-swarm-simulator"
 
 [project.scripts]
 seo-swarm = "seo_swarm.cli:main"

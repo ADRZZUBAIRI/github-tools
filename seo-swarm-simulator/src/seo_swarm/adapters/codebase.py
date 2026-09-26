@@ -9,18 +9,46 @@ Parses multiple frameworks and static markup standards:
 - Astro (.astro)
 - Django / Jinja (.html templates)
 
-Extracts clean textual representation, title metadata, headings, schemas, and links.
+Extracts clean textual representation, title metadata, headings, schemas, and public URL mappings.
 """
 
 import os
 import re
 from typing import Dict, List, Any, Optional
+from urllib.parse import urlparse
 
-def extract_page_primitives(file_path: str) -> Dict[str, Any]:
+def normalize_route_path(file_path: str, root_dir: str, site_url: Optional[str] = None) -> Dict[str, str]:
+    """Computes clean relative route, public URL, and canonical path from a source file."""
+    clean_root = root_dir.replace("\\", "/").rstrip("/")
+    clean_file = file_path.replace("\\", "/")
+    
+    if clean_file.startswith(clean_root):
+        rel_path = clean_file[len(clean_root):].lstrip("/")
+    else:
+        rel_path = os.path.basename(clean_file)
+        
+    # Remove file extension and index references for clean web route
+    route = "/" + rel_path
+    route = re.sub(r'/(?:index)?\.(?:html?|php|jsx?|tsx?|vue|astro)$', '', route, flags=re.IGNORECASE)
+    if not route:
+        route = "/"
+        
+    base_domain = site_url.rstrip("/") if site_url else "https://example.com"
+    public_url = f"{base_domain}{route}"
+    
+    return {
+        "rel_path": rel_path,
+        "route": route,
+        "public_url": public_url
+    }
+
+def extract_page_primitives(file_path: str, root_dir: Optional[str] = None, site_url: Optional[str] = None) -> Dict[str, Any]:
     """Inspects any web template or static document and normalizes into a common audit payload."""
     if not os.path.exists(file_path):
         return {
             "url": file_path,
+            "route": "/" + os.path.basename(file_path),
+            "public_url": f"https://example.com/{os.path.basename(file_path)}",
             "title": os.path.basename(file_path),
             "html": "",
             "text": "",
@@ -75,8 +103,13 @@ def extract_page_primitives(file_path: str) -> Dict[str, Any]:
     clean_text = re.sub(r'<[^>]+>', ' ', raw_content)
     clean_text = re.sub(r'\s+', ' ', clean_text).strip()
 
+    route_info = normalize_route_path(file_path, root_dir or os.path.dirname(file_path), site_url)
+
     return {
         "url": file_path,
+        "rel_path": route_info["rel_path"],
+        "route": route_info["route"],
+        "public_url": route_info["public_url"],
         "title": title,
         "html": raw_content,
         "text": clean_text,
@@ -90,7 +123,7 @@ def discover_public_codebase_routes(root_dir: str, extensions: Optional[List[str
         
     ignored_patterns = [
         "/includes/", "/components/", "/scratch/", "/api/", "/db/", "/system/", 
-        "/templates/", "/vendor/", "/node_modules/", "/.git/", "/.next/", "/dist/", "/build/"
+        "/templates/", "/vendor/", "/node_modules/", "/.git/", "/.next/", "/dist/", "/build/", "/.cache/"
     ]
     
     public_files = []

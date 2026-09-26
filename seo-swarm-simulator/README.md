@@ -1,11 +1,10 @@
 # SEO Swarm Simulator (62-Role Adversarial Intelligence Engine)
 
-[![PyPI Version](https://img.shields.io/badge/pypi-v1.0.1-blue.svg)](https://pypi.org/project/seo-swarm-simulator/)
+[![PyPI Version](https://img.shields.io/badge/pypi-v1.0.2-blue.svg)](https://pypi.org/project/seo-swarm-simulator/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-purple.svg)](https://www.python.org/downloads/)
-[![Maintained by WebSmitherz](https://img.shields.io/badge/Maintained%20by-WebSmitherz-orange.svg)](https://websmitherz.com)
 
-> **"The Anti-Vanity SEO Engine"**: While traditional SEO linters award empty 95/100 scores for basic tag presence, `seo-swarm-simulator` enforces **rigorous search performance and empirical evidence gating** (GSC clickstream verification, 28-day acquisition failure hard caps, information gain utility requirements, unverified authority gating, and commercial buyer friction).
+> **"The Anti-Vanity SEO Swarm"**: A neutral, hardware-safe multi-agent SEO simulation engine that enforces **rigorous search performance and empirical evidence gating** (GSC clickstream verification, 28-day acquisition failure hard caps, verified competitive KD vs. DA reality, information gain utility proof, and commercial buyer friction) across **any web codebase and tech stack**.
 
 ---
 
@@ -17,10 +16,10 @@ Traditional SEO linters check whether `<title>`, `<h1>`, and `alt` tags exist. T
 1. **Search Console Performance Reality**: Ingests Google Search Console CSV exports (`Pages.csv`, `Queries.csv`, `Chart.csv`, `Filters.csv`) and enforces hard reality caps:
    - **Missing GSC Data**: Hard-caps score at `20.0/100` (`GSC_DATA_REQUIRED`). No free passes without verified acquisition data.
    - **28-Day Acquisition Failure**: Sites with verified 28+ day datasets showing $< 500$ impressions and 0 clicks across 50+ pages are hard-capped at `10.0/100` (`CRITICAL_ACQUISITION_FAILURE`).
-2. **Authority Evidence Contract**: Separates `VERIFIED` backlink profiles from `UNKNOWN` states. Domains without verified third-party link evidence are hard-capped at `30.0/100` rather than assuming arbitrary DA numbers.
-3. **Information Gain Patent**: Demands proprietary calculation tools and empirical telemetry over derivative textbook definitions.
-4. **Commercial Buyer Skepticism**: Simulates trade business decision-makers testing for 1-tap `tel:` phone actions and explicit 100% asset ownership guarantees.
-5. **Zero Vanity Inflation**: Unimplemented roles are explicitly reported as `not_implemented` (score: 0.0) and excluded from scoring averages.
+2. **Authority Evidence Contract**: Separates `VERIFIED` backlink profiles (with matching domain and provider metadata) from `UNKNOWN` states. Domains without verified third-party link evidence are hard-capped at `30.0/100` rather than assuming arbitrary DA numbers.
+3. **Competitive KD vs. DA Reality**: Evaluates target query difficulty against domain authority using competitive SERP snapshots (`--serp-file`).
+4. **Information Gain Proof**: Demands functional calculation scripts, empirical benchmark tables, or executable code demonstrations over purely narrative prose.
+5. **Universal Framework & Profile Separation**: Adapts automatically to **Static HTML, PHP/Laravel, React/Next.js (`.jsx`/`.tsx`), Vue/Nuxt (`.vue`), Astro (`.astro`), and Django**, guided by configurable industry profiles (`generic`, `saas`, `local_services`, `ecommerce`).
 
 ---
 
@@ -50,7 +49,7 @@ Traditional SEO linters check whether `<title>`, `<h1>`, and `alt` tags exist. T
 • International & Hreflang      • Semantic Coverage Analyst   
 • Local SEO Tech Specialist (*) • Localization Editor         [G. Conversion & Buyers (7)]
 • Ecommerce Faceted Nav         • Multimedia Producer         • Voice-of-Customer Analyst
-• Migration & Redirects                                       • Skeptical Contractor (*)
+• Migration & Redirects                                       • Skeptical Trade Persona (*)
 • CMS Code Architect (*)                                      • Mobile-First Customer (*)
 • Multimedia Search                                           • Comparison Shopper
 • Security & Privacy SEO                                      • UX & CRO Funnel Analyst (*)
@@ -88,92 +87,54 @@ pip install -e .
 
 ## 💻 CLI Usage
 
-Audit local PHP templates, HTML files, or entire site repositories with verified GSC data and reality gating:
+Audit any web page, template, or entire codebase with verified GSC data and reality gating:
 
 ```bash
-# 1. Single Page Audit without GSC (Correctly capped at 20/100 GSC_DATA_REQUIRED)
-seo-swarm path/to/page.php --preset single_page_audit
+# 1. Single Page Generic Audit (Static HTML, React, Next.js, PHP, Astro, Vue)
+seo-swarm path/to/page.tsx --preset single_page_audit
 
-# 2. Single Page Audit with Verified 28-Day GSC Export Directory
-seo-swarm path/to/page.php --preset single_page_audit --gsc-dir path/to/gsc_export/
+# 2. SaaS Trial & Pricing Audit
+seo-swarm path/to/pricing.jsx --profile saas --preset single_page_audit
 
-# 3. Local Contractor Landing Page Audit
-seo-swarm path/to/local-roofing-page.php --preset local_roofing_audit --gsc-dir path/to/gsc_export/
+# 3. Local Service Landing Page Audit with GSC Export Directory
+seo-swarm path/to/landing.html --profile local_services --gsc-dir path/to/gsc_export/
 
-# 4. Full Technical Architecture Audit
-seo-swarm path/to/index.php --preset full_technical_audit
-
-# 5. Full 62-Role Squad Audit
-seo-swarm path/to/page.php --preset full_red_team_all_62 --gsc-dir path/to/gsc_export/
+# 4. Verified Competitive Audit with Backlink Profile and SERP Snapshot
+seo-swarm path/to/page.php --authority-file ./backlinks.json --serp-file ./serp.json
 ```
 
 ### Site-Wide Cluster and Full-Site Runners
 
 ```bash
-# Multi-cluster reality audit across Core, Local, Blog, and Tools
-python run_multi_cluster_audit.py --root /path/to/site --gsc-dir /path/to/gsc_export
+# Multi-cluster reality audit across auto-discovered taxonomy buckets
+python run_multi_cluster_audit.py --root /path/to/codebase --profile saas --gsc-dir /path/to/gsc_export
 
-# Full-site 62-role adversarial audit across all public pages
-python run_62_roles_site_audit.py --root /path/to/site --output ./full_site_audit.json --gsc-dir /path/to/gsc_export
+# Full-site 62-role adversarial audit across all public routes
+python run_62_roles_site_audit.py --root /path/to/codebase --output ./site_audit.json --profile generic --gsc-dir /path/to/gsc_export
 ```
 
 ---
 
-## 📊 Sample Output (The Brutal Truth)
+## 📄 Profile Configuration Example (`profile.yaml`)
 
+```yaml
+profile_id: b2b_saas
+brand_name: Acme Cloud
+site_url: https://acme.example.com
+industry: saas
+target_scope: global
+target_languages:
+  - en
+business_model: subscriptions_demos
+required_signals:
+  - free_trial_or_demo
+  - pricing_transparency
+  - api_documentation
+active_personas:
+  - comparison_shopper
+  - technical_buyer
+  - information_gain_critic
 ```
-########################################################################################
-                    62-ROLE ADVERSARIAL SEO SWARM ENGINE
-                  Task Preset: [SINGLE_PAGE_AUDIT] (19 Active Specialists)
-########################################################################################
- Target File  : pages/services/roofing-seo.php
- GSC Ingestion: Active (7 days: 488 impr, 1 clicks across 186 pages)
- Authority    : UNKNOWN (0 ref domains)
- Run ID       : RUN-A78C1E44 | Mode: Uninflated Reality Execution
-########################################################################################
-
-[FAIL] [C. Keyword/SERP] SERP Difficulty & Realist Competitor Analyst (Score: 15.0/100) -> HIGH_NATIONAL_KD_RISK
-   |-- [FATAL] UNVERIFIED SERP: Page title targets highly saturated national query. High probability of Page 9 suppression without substantial DA.
-
-[PASS] [G. Conversion] Skeptical Commercial Contractor Persona (Score: 85.0/100) -> CONTRACTOR_TRUST_EARNED
-   |-- [OBS] Contractor conversion criteria satisfied (1-tap call & ownership).
-
-[FAIL] [E. Content] Information Gain & Original Data Critic (Score: 25.0/100) -> DERIVATIVE_CONTENT_RISK
-   |-- [FATAL] LOW INFORMATION GAIN: Content contains mainly static descriptive text without proprietary calculators or verified empirical datasets.
-
-[WARN] [F. Authority] Off-Page Authority & Entity Backlink Auditor -> INSUFFICIENT_EVIDENCE (AUTHORITY_DATA_UNVERIFIED)
-   |-- [MISSING DATA] No external backlink dataset (Ahrefs/Moz/GSC links) loaded. Authority status is UNKNOWN.
-
-========================================================================================
-                      CHIEF REFEREE SYNTHESIZED DECISION
-========================================================================================
- Raw Heuristic Score     : 56.4 / 100
- Final Capped Score      : 20.0 / 100
- Decision Verdict        : GSC_DATA_REQUIRED / SHORT_WINDOW_RESTRICTED
- Scored Specialists      : 10 evaluated (of 19 active in preset)
-
-[!] HARD REALITY CAPS APPLIED BY CHIEF REFEREE:
-   * [CAP 20.0/100] GSC SHORT-WINDOW WARNING (7 days): 488 impressions and 1 click recorded. Insufficient full 28-day baseline; capped at 20.0/100.
-   * [CAP 30.0/100] UNVERIFIED AUTHORITY GATE: No backlink dataset/API configured. Domain authority status is UNKNOWN. Score hard-capped at 30.0/100.
-
-[!] FATAL STRUCTURAL FLAWS EXPOSED:
-   1. UNVERIFIED SERP: Page title targets highly saturated national query. High probability of Page 9 suppression without substantial DA.
-   2. LOW INFORMATION GAIN: Content contains mainly static descriptive text without proprietary calculators or verified empirical datasets.
-
-[+] MANDATORY RESCUE ACTIONS:
-   * [CRITICAL] Embed Interactive Utility: Replace static copy with interactive estimate or loss calculators.
-   * [CRITICAL] Target Local Intent or Integration Hub: Narrow targeting to geo-modifiers or exact CRM webhook solutions.
-========================================================================================
-```
-
----
-
-## 🛠️ Resources & Engineering Hub
-
-Maintained by [WebSmitherz Systems Engineering](https://websmitherz.com).
-- [Free Contractor Schema Generator](https://websmitherz.com/tools/contractor-schema-generator)
-- [Roofing SEO & Web Design Systems](https://websmitherz.com/services/roofing-seo)
-- [Local Google Business Profile SEO Engine](https://websmitherz.com/services/gmb-local-seo)
 
 ---
 
