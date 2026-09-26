@@ -2,7 +2,7 @@
 CLI Entry Point & Dynamic Squad Orchestrator for 62-Role SEO Swarm
 ===================================================================
 Executes uninflated role evaluation with GSC dataset ingestion, evidence binding,
-and hard reality caps enforced by Chief Referee.
+universal codebase adaptation, profile/domain-pack resolution, and Chief Referee reality caps.
 """
 
 import os
@@ -16,27 +16,22 @@ from seo_swarm.store.database import init_db, store_run, store_evidence, store_e
 from seo_swarm.roles.roster import ALL_62_ROLES, get_active_roles, TASK_ACTIVATION_PRESETS
 from seo_swarm.ingest.gsc_ingest import GSCDataIngestor
 from seo_swarm.analysis.decision_gate import apply_hard_reality_caps
+from seo_swarm.config.profile import load_project_profile
+from seo_swarm.adapters.codebase import extract_page_primitives
 
-def run_swarm_audit(target_file_path: str, task_preset: str = "single_page_audit", gsc_dir: Optional[str] = None, authority_file: Optional[str] = None):
+def run_swarm_audit(
+    target_file_path: str,
+    task_preset: str = "single_page_audit",
+    profile_name_or_path: str = "generic",
+    gsc_dir: Optional[str] = None,
+    authority_file: Optional[str] = None
+):
     if not os.path.exists(target_file_path):
         print(f"[!] Error: Target file '{target_file_path}' does not exist.")
         return
 
-    with open(target_file_path, "r", encoding="utf-8", errors="ignore") as f:
-        html_content = f.read()
-
-    title_m = re.search(r'\$page_title\s*=\s*["\']([^"\']+)["\']|<title>([^<]+)</title>', html_content, re.IGNORECASE)
-    title = (title_m.group(1) or title_m.group(2)) if title_m else os.path.basename(target_file_path)
-
-    clean_text = re.sub(r'<[^>]+>', ' ', html_content)
-    clean_text = re.sub(r'\s+', ' ', clean_text).strip()
-
-    page_data = {
-        "url": target_file_path,
-        "title": title,
-        "html": html_content,
-        "text": clean_text
-    }
+    profile = load_project_profile(profile_name_or_path)
+    page_data = extract_page_primitives(target_file_path)
 
     # Ingest verified GSC data (if provided)
     gsc_ingestor = GSCDataIngestor(gsc_dir) if gsc_dir else GSCDataIngestor(None)
@@ -46,7 +41,6 @@ def run_swarm_audit(target_file_path: str, task_preset: str = "single_page_audit
     # Authority Data Handling: Default to UNKNOWN unless verified provider is supplied
     authority_data = {"status": "UNKNOWN", "referring_domains": 0, "domain_authority": 0}
     if authority_file and os.path.exists(authority_file):
-        # Support basic JSON authority input
         try:
             import json
             with open(authority_file, "r", encoding="utf-8") as af:
@@ -55,17 +49,23 @@ def run_swarm_audit(target_file_path: str, task_preset: str = "single_page_audit
         except Exception:
             authority_data = {"status": "UNKNOWN", "referring_domains": 0, "domain_authority": 0}
 
-    active_roles = get_active_roles(task_preset)
+    active_roles = get_active_roles(task_preset, profile=profile)
     run_id = f"RUN-{uuid.uuid4().hex[:8].upper()}"
     conn = init_db()
     store_run(conn, run_id, target_file_path, task_preset)
+
+    html_content = page_data.get("html", "")
+    clean_text = page_data.get("text", "")
+    title = page_data.get("title", "")
 
     evidence_map: Dict[str, Any] = {
         "EVD-TITLE": title,
         "EVD-SCHEMA": "application/ld+json" in html_content,
         "EVD-TEL": "tel:" in html_content,
-        "EVD-SECTIONS": str(len(re.findall(r'<section\b', html_content, re.IGNORECASE))),
-        "EVD-AUTHORITY": authority_data
+        "EVD-SECTIONS": str(len(re.findall(r'<(?:section|article|div\s+class=[\'"][^\'"]*(?:container|section|wrapper)[^\'"]*)', html_content, re.IGNORECASE))),
+        "EVD-AUTHORITY": authority_data,
+        "EVD-PROFILE": profile,
+        "EVD-FRAMEWORK": page_data.get("framework", "generic")
     }
     if site_gsc["is_active"]:
         evidence_map["EVD-GSC-SITE"] = site_gsc
@@ -78,14 +78,15 @@ def run_swarm_audit(target_file_path: str, task_preset: str = "single_page_audit
     evaluations = []
     print("\n" + "#" * 88)
     print(" " * 20 + "62-ROLE ADVERSARIAL SEO SWARM ENGINE")
-    print(" " * 18 + f"Task Preset: [{task_preset.upper()}] ({len(active_roles)} Active Specialists)")
+    print(" " * 18 + f"Preset: [{task_preset.upper()}] | Profile: [{profile['profile_id']}]")
     print("#" * 88)
-    print(f" Target File  : {target_file_path}")
+    print(f" Target File  : {target_file_path} (Framework: {page_data.get('framework')})")
     if site_gsc['is_active']:
         print(f" GSC Ingestion: Active ({site_gsc['complete_days']} days: {site_gsc['total_impressions']} impr, {site_gsc['total_clicks']} clicks across {site_gsc['tracked_pages_count']} pages)")
     else:
         print(f" GSC Ingestion: Not Loaded (Organic search metrics UNKNOWN)")
     print(f" Authority    : {authority_data['status']} ({authority_data.get('referring_domains', 0)} ref domains)")
+    print(f" Industry/Pack: {profile.get('industry', 'generic')} (Scope: {profile.get('target_scope', 'national')})")
     print(f" Run ID       : {run_id} | Mode: Uninflated Reality Execution")
     print("#" * 88 + "\n")
 
@@ -117,9 +118,19 @@ def run_swarm_audit(target_file_path: str, task_preset: str = "single_page_audit
     ]
     raw_avg = round(sum(e["score"] for e in scored_evals) / len(scored_evals), 1) if scored_evals else 0.0
 
-    # Apply Chief Referee Hard Reality Caps
-    is_national = ("roofing seo" in title.lower() or "seo services" in title.lower()) and not any(c in title.lower() for c in ["tyler", "waco", "san angelo", "macon", "clarksville", "midland", "odessa", "katy", "woodlands", "sugar land"])
-    commercial_data = {"has_tap_to_call": "tel:" in html_content, "has_ownership_guarantee": ("100%" in clean_text or "ownership" in clean_text.lower())}
+    # Apply Chief Referee Hard Reality Caps dynamically scoped by profile
+    target_locations = profile.get("target_locations", [])
+    is_national = profile.get("target_scope") != "local" or (target_locations and not any(loc.lower() in title.lower() for loc in target_locations))
+    
+    # Commercial signals dynamically evaluated against profile requirements
+    req_signals = profile.get("required_signals", [])
+    has_tap_to_call = "tel:" in html_content if "tap_to_call" in req_signals else True
+    has_ownership = ("100%" in clean_text or "ownership" in clean_text.lower()) if "ownership_or_trust_guarantee" in req_signals else True
+    
+    commercial_data = {
+        "has_tap_to_call": has_tap_to_call,
+        "has_ownership_guarantee": has_ownership
+    }
     
     gate_decision = apply_hard_reality_caps(
         raw_score=raw_avg,
@@ -164,14 +175,15 @@ def run_swarm_audit(target_file_path: str, task_preset: str = "single_page_audit
     print("=" * 88 + "\n")
 
 def main():
-    parser = argparse.ArgumentParser(description="Run 62-Role SEO Swarm Simulator")
-    parser.add_argument("target", nargs="?", default=r"c:\WebSmitherz\websmitherz\pages\services\roofing-seo.php")
+    parser = argparse.ArgumentParser(description="Run 62-Role Generic SEO Swarm Simulator")
+    parser.add_argument("target", nargs="?", default="index.html", help="Path to target page, template or markup file")
     parser.add_argument("--preset", default="single_page_audit", choices=list(TASK_ACTIVATION_PRESETS.keys()))
+    parser.add_argument("--profile", default="generic", help="Industry profile pack ('generic', 'saas', 'local_services' or path to profile.json)")
     parser.add_argument("--gsc-dir", default=None, help="Directory containing GSC CSV exports (Pages.csv, Chart.csv, etc.)")
     parser.add_argument("--authority-file", default=None, help="JSON file containing verified referring_domains and domain_authority")
     args = parser.parse_args()
     
-    run_swarm_audit(args.target, args.preset, args.gsc_dir, args.authority_file)
+    run_swarm_audit(args.target, args.preset, args.profile, args.gsc_dir, args.authority_file)
 
 if __name__ == "__main__":
     main()
