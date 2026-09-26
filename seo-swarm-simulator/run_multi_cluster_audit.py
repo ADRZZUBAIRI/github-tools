@@ -9,6 +9,7 @@ Runs the adversarial SEO swarm engine across key discovered route clusters in AN
 
 import os
 import sys
+import re
 import json
 import argparse
 from collections import defaultdict

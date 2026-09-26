@@ -8,7 +8,9 @@ Uses the universal codebase adapter, profile system, GSC ingestor, and Chief Ref
 
 import os
 import sys
+import re
 import json
+import uuid
 import argparse
 from collections import defaultdict
 from typing import Dict, Any, Optional
@@ -23,7 +25,7 @@ from seo_swarm.config.profile import load_project_profile
 from seo_swarm.adapters.codebase import extract_page_primitives, discover_public_codebase_routes
 from seo_swarm.adapters.authority import validate_authority_data
 from seo_swarm.adapters.serp import load_serp_snapshot
-from seo_swarm.store.database import init_db, store_run, store_evidence, store_evaluation
+from seo_swarm.store.database import init_db, store_run, store_evidence, store_evaluation, finalize_run
 
 def run_universal_site_audit(
     root_dir: str,
@@ -31,7 +33,8 @@ def run_universal_site_audit(
     profile_name_or_path: str = "generic",
     gsc_dir: Optional[str] = None,
     authority_file: Optional[str] = None,
-    serp_file: Optional[str] = None
+    serp_file: Optional[str] = None,
+    db_path: Optional[str] = None
 ):
     if not os.path.exists(root_dir):
         print(f"[!] Error: Root directory '{root_dir}' does not exist.")
@@ -66,7 +69,7 @@ def run_universal_site_audit(
     print(f"      SERP Snapshot  : {'Loaded (KD ' + str(serp_data['keyword_difficulty']) + ')' if serp_data else 'Provisional (None)'}")
     print("=" * 92 + "\n")
     
-    conn = init_db()
+    conn = init_db(db_path)
     active_roles = get_active_roles("full_red_team_all_62", profile=profile)
     
     results = []
@@ -104,13 +107,17 @@ def run_universal_site_audit(
         if serp_data:
             evidence_map["EVD-SERP-COMPETITORS"] = serp_data
             
-        run_id = f"RUN-SITE-{idx:04d}"
-        store_run(conn, run_id, file_path, "full_red_team_all_62")
+        run_id = f"RUN-SITE-{uuid.uuid4().hex[:8].upper()}"
+        store_run(conn, run_id, file_path, profile.get("profile_id", "generic"))
+        
+        for k, v in evidence_map.items():
+            store_evidence(conn, run_id, k, "source_inspection", file_path, "1-end", str(v), {"value": v})
         
         evaluations = []
         for role in active_roles:
             res = role.evaluate(page_data, evidence_map)
             evaluations.append(res)
+            store_evaluation(conn, run_id, res["agent_id"], res["role"], res["status"], res["score"], res["verdict"], res["observations"], res["recommendations"])
             if res["status"] == "complete":
                 squad_scores[role.squad].append(res["score"])
                 
@@ -136,12 +143,28 @@ def run_universal_site_audit(
         )
         
         flaws = []
+        recs = []
         for e in evaluations:
             for obs in e.get("observations", []):
                 if obs.get("type") == "fatal_flaw":
                     flaws.append(obs["statement"])
                     flaw_key = obs["statement"].split(":")[0] if ":" in obs["statement"] else obs["statement"][:45]
                     fatal_flaws_tally[flaw_key] += 1
+            for r in e.get("recommendations", []):
+                recs.append(r)
+                
+        finalize_run(
+            conn,
+            run_id=run_id,
+            raw_score=gate_decision["raw_score"],
+            final_score=gate_decision["final_capped_score"],
+            verdict=gate_decision["verdict"],
+            summary={
+                "caps": gate_decision["cap_reasons"],
+                "fatal_flaws": flaws,
+                "recs": recs
+            }
+        )
                     
         # Dynamic Cluster/Category Isolation
         if "/" in route.strip("/"):
@@ -203,9 +226,10 @@ def main():
     parser.add_argument("--gsc-dir", default=None, help="Directory containing GSC export CSVs")
     parser.add_argument("--authority-file", default=None, help="Validated authority profile JSON file")
     parser.add_argument("--serp-file", default=None, help="Competitive SERP snapshot JSON file")
+    parser.add_argument("--db-path", default=None, help="Custom SQLite database path")
     args = parser.parse_args()
     
-    run_universal_site_audit(args.root, args.output, args.profile, args.gsc_dir, args.authority_file, args.serp_file)
+    run_universal_site_audit(args.root, args.output, args.profile, args.gsc_dir, args.authority_file, args.serp_file, args.db_path)
 
 if __name__ == "__main__":
     main()

@@ -201,6 +201,132 @@ def test_serp_snapshot_loading():
     assert snapshot["keyword_difficulty"] == 42
     assert snapshot["competitor_count"] == 2
 
+def test_serp_snapshot_minimal_query_only_not_verified():
+    """Query-only object without competitors or provenance should have is_verified=False."""
+    serp_payload = {"target_query": "roofing seo"}
+    snapshot = load_serp_snapshot(serp_payload)
+    assert snapshot["target_query"] == "roofing seo"
+    assert snapshot["competitor_count"] == 0
+    assert snapshot["is_verified"] is False
+
+def test_authority_substring_mismatch_rejected():
+    """Substring domains like evil-example.com or notexample.com must be rejected for example.com."""
+    auth_payload = {
+        "domain": "evil-example.com",
+        "provider": "ahrefs",
+        "referring_domains": 100,
+        "domain_authority": 50
+    }
+    validated = validate_authority_data(auth_payload, expected_site_url="https://example.com")
+    assert validated["status"] == "UNKNOWN"
+
+    auth_payload_missing_domain = {
+        "provider": "ahrefs",
+        "referring_domains": 100,
+        "domain_authority": 50
+    }
+    validated_missing = validate_authority_data(auth_payload_missing_domain, expected_site_url="https://example.com")
+    assert validated_missing["status"] == "UNKNOWN"
+
+def test_gsc_consecutive_date_validation():
+    """Duplicate dates in Chart.csv should not count as 28 days or consecutive."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        chart_path = os.path.join(temp_dir, "Chart.csv")
+        with open(chart_path, "w", encoding="utf-8") as f:
+            f.write("Date,Clicks,Impressions,CTR,Position\n")
+            # Write 28 duplicate rows of the same single date
+            for _ in range(28):
+                f.write("2026-01-01,0,5,0%,55.0\n")
+                
+        ingestor = GSCDataIngestor(temp_dir)
+        metrics = ingestor.get_site_metrics()
+        assert metrics["complete_days"] == 1
+        assert metrics["is_consecutive_window"] is False
+
+def test_nested_yaml_profile_loading():
+    """Verify nested mappings like codebase.framework and codebase.extensions."""
+    yaml_content = """
+profile_id: custom_vue_app
+brand_name: Vue App
+industry: saas
+codebase:
+  framework: vue
+  extensions:
+    - .vue
+    - .html
+active_personas:
+  - technical_buyer
+"""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as tf:
+        tf.write(yaml_content)
+        tf_path = tf.name
+        
+    try:
+        loaded = load_project_profile(tf_path)
+        assert loaded["profile_id"] == "custom_vue_app"
+        assert loaded["codebase"]["framework"] == "vue"
+        assert ".vue" in loaded["codebase"]["extensions"]
+        assert loaded["active_personas"] == ["technical_buyer"]
+    finally:
+        os.remove(tf_path)
+
+def test_database_migration_from_v1_legacy():
+    """Verify init_db() automatically migrates legacy v1 database schemas without crashing."""
+    import sqlite3
+    from seo_swarm.store.database import init_db, store_evidence, store_run, finalize_run
+    with tempfile.NamedTemporaryFile(suffix=".sqlite3", delete=False) as tf:
+        db_path = tf.name
+
+    try:
+        # Create legacy v1 schema manually
+        conn = sqlite3.connect(db_path)
+        conn.execute("""
+        CREATE TABLE runs (
+            run_id TEXT PRIMARY KEY,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            target_url TEXT,
+            profile TEXT DEFAULT 'generic',
+            status TEXT DEFAULT 'running'
+        );
+        """)
+        conn.execute("""
+        CREATE TABLE evidence (
+            evidence_id TEXT,
+            run_id TEXT,
+            category TEXT,
+            source_file TEXT,
+            line_range TEXT,
+            observed_fact TEXT,
+            raw_payload JSON,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+        conn.execute("INSERT INTO runs (run_id, target_url) VALUES ('LEGACY-01', 'index.html');")
+        conn.execute("INSERT INTO evidence (evidence_id, run_id, category, source_file, line_range, observed_fact, raw_payload) VALUES ('EVD-TITLE', 'LEGACY-01', 'source', 'index.html', '1', 'Title', '{}');")
+        conn.commit()
+        conn.close()
+
+        # Run init_db() on the legacy database
+        new_conn = init_db(db_path)
+        try:
+            # Verify writing new evidence using v2 evidence_key works seamlessly
+            store_evidence(new_conn, "LEGACY-01", "EVD-SCHEMA", "test", "index.html", "1-10", "Fact", {"schema": True})
+            finalize_run(new_conn, "LEGACY-01", 50.0, 20.0, "GSC_DATA_REQUIRED", {"summary": "migrated"})
+            
+            cur = new_conn.cursor()
+            cur.execute("SELECT raw_score, final_score, verdict FROM runs WHERE run_id = 'LEGACY-01';")
+            row = cur.fetchone()
+            assert row[0] == 50.0
+            assert row[1] == 20.0
+            assert row[2] == "GSC_DATA_REQUIRED"
+        finally:
+            new_conn.close()
+    finally:
+        try:
+            os.remove(db_path)
+        except Exception:
+            pass
+
 def test_information_gain_demands_functional_utility():
     """Information gain role must pass pages with interactive JS functions or tables and fail purely static text."""
     from seo_swarm.roles.roster import InformationGainDataCriticRole
@@ -220,3 +346,4 @@ def test_information_gain_demands_functional_utility():
     res_interactive = role.evaluate(interactive_page, {})
     assert res_interactive["score"] >= 85.0
     assert res_interactive["verdict"] == "INFORMATION_GAIN_CONFIRMED"
+

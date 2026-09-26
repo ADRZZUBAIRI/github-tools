@@ -92,57 +92,92 @@ PROFILE_REGISTRY = {
 }
 
 def _parse_yaml_basic(content: str) -> Dict[str, Any]:
-    """Lightweight zero-dependency YAML subset parser for simple key-value and list structures."""
+    """Lightweight zero-dependency YAML parser supporting nested mappings, lists, and primitives."""
     res: Dict[str, Any] = {}
     lines = content.splitlines()
+    
+    current_section = None
     current_key = None
-    current_list = None
     
     for raw_line in lines:
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
+        stripped = raw_line.strip()
+        if not stripped or stripped.startswith("#"):
             continue
             
-        # Check list item under current key
-        if line.startswith("- ") and current_key:
-            item_val = line[2:].strip().strip("\"'")
-            if current_list is None:
-                current_list = []
-                res[current_key] = current_list
-            current_list.append(item_val)
+        indent = len(raw_line) - len(raw_line.lstrip(" "))
+        
+        # Check list item
+        if stripped.startswith("- "):
+            item_val = stripped[2:].strip().strip("\"'")
+            if indent >= 2 and current_section and current_key and current_key != current_section:
+                # Sub-list under a section (e.g. codebase.extensions)
+                if not isinstance(res.get(current_section), dict):
+                    res[current_section] = {}
+                if not isinstance(res[current_section].get(current_key), list):
+                    res[current_section][current_key] = []
+                res[current_section][current_key].append(item_val)
+            else:
+                # Top level list
+                target_key = current_key or current_section
+                if target_key:
+                    if not isinstance(res.get(target_key), list):
+                        res[target_key] = []
+                    res[target_key].append(item_val)
             continue
-            
-        current_list = None
-        if ":" in line:
-            parts = line.split(":", 1)
+
+        if ":" in stripped:
+            parts = stripped.split(":", 1)
             k = parts[0].strip()
             v = parts[1].strip()
-            current_key = k
             
-            if v == "" or v == "[]":
-                res[k] = [] if v == "[]" else {}
-            elif v == "{}":
-                res[k] = {}
-            elif v.lower() == "true":
-                res[k] = True
-            elif v.lower() == "false":
-                res[k] = False
-            elif v.isdigit():
-                res[k] = int(v)
+            if indent >= 2 and current_section:
+                # Child key of section
+                current_key = k
+                if not isinstance(res.get(current_section), dict):
+                    res[current_section] = {}
+                if v == "" or v == "[]":
+                    res[current_section][k] = [] if v == "[]" else {}
+                elif v == "{}":
+                    res[current_section][k] = {}
+                elif v.lower() == "true":
+                    res[current_section][k] = True
+                elif v.lower() == "false":
+                    res[current_section][k] = False
+                elif v.isdigit():
+                    res[current_section][k] = int(v)
+                else:
+                    res[current_section][k] = v.strip("\"'")
             else:
-                # String value (strip quotes)
-                res[k] = v.strip("\"'")
-                
+                # Top level key
+                current_section = k if v == "" else None
+                current_key = k
+                if v == "":
+                    # If this is followed by lists or dicts, don't set scalar
+                    pass
+                elif v == "[]":
+                    res[k] = []
+                elif v == "{}":
+                    res[k] = {}
+                elif v.lower() == "true":
+                    res[k] = True
+                elif v.lower() == "false":
+                    res[k] = False
+                elif v.isdigit():
+                    res[k] = int(v)
+                else:
+                    res[k] = v.strip("\"'")
+
     return res
 
 def load_project_profile(profile_path_or_id: Optional[str] = None) -> Dict[str, Any]:
     """Loads a project profile from JSON/YAML or resolves a built-in profile ID.
     Fails loudly with ValueError if the specified file does not exist or is invalid."""
+    import copy
     if not profile_path_or_id or profile_path_or_id == "generic":
-        return dict(DEFAULT_GENERIC_PROFILE)
+        return copy.deepcopy(DEFAULT_GENERIC_PROFILE)
         
     if profile_path_or_id in PROFILE_REGISTRY:
-        return dict(PROFILE_REGISTRY[profile_path_or_id])
+        return copy.deepcopy(PROFILE_REGISTRY[profile_path_or_id])
         
     if not os.path.exists(profile_path_or_id):
         raise FileNotFoundError(f"Profile configuration file '{profile_path_or_id}' not found.")
@@ -169,8 +204,20 @@ def load_project_profile(profile_path_or_id: Optional[str] = None) -> Dict[str, 
             if not data:
                 raise ValueError(f"Profile file '{profile_path_or_id}' is neither valid JSON nor YAML.")
 
-    # Validate essential schema fields
-    merged = {**DEFAULT_GENERIC_PROFILE, **data}
+    if not isinstance(data, dict):
+        raise ValueError("Profile schema validation error: root must be a dictionary/mapping.")
+
+    if "active_personas" in data and not isinstance(data["active_personas"], list):
+        raise ValueError("Profile schema validation error: 'active_personas' must be a list.")
+
+    # Deep merge with default profile
+    merged = copy.deepcopy(DEFAULT_GENERIC_PROFILE)
+    for k, v in data.items():
+        if k == "codebase" and isinstance(v, dict):
+            merged["codebase"] = {**merged.get("codebase", {}), **v}
+        else:
+            merged[k] = v
+
     if not merged.get("profile_id"):
         raise ValueError("Profile schema validation error: 'profile_id' is required.")
         

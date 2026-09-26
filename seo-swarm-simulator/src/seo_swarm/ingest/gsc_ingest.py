@@ -1,15 +1,18 @@
-"""
-GSC & Analytics Dataset Ingest Engine
-=====================================
-Ingests Google Search Console CSV exports (Pages, Queries, Devices, Countries, Chart, Filters)
-and builds validated evidence objects with date windows, impressions, clicks, CTR, and positions.
-Validates window completeness (e.g. 28+ days vs 7 days vs unknown), consecutive dates, and property matching.
-"""
-
 import os
 import csv
+from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
 from urllib.parse import urlparse
+
+def _extract_domain_from_url(url: str) -> str:
+    raw = url.strip().lower()
+    if "://" in raw:
+        parsed = urlparse(raw)
+        raw = parsed.netloc or parsed.path
+    raw = raw.split("/")[0].split(":")[0]
+    if raw.startswith("www."):
+        raw = raw[4:]
+    return raw
 
 class GSCDataIngestor:
     def __init__(self, gsc_dir: Optional[str] = None, expected_site_url: Optional[str] = None):
@@ -53,18 +56,32 @@ class GSCDataIngestor:
         if os.path.exists(chart_file):
             with open(chart_file, "r", encoding="utf-8", errors="ignore") as f:
                 reader = csv.DictReader(f)
-                dates = []
+                dates_set = set()
                 for row in reader:
                     self.chart_data.append(row)
                     d = row.get("Date", "").strip()
                     if d:
-                        dates.append(d)
-                if dates:
-                    dates.sort()
-                    self.window_start = dates[0]
-                    self.window_end = dates[-1]
-                    self.complete_days = len(dates)
-                    self.is_consecutive_window = (self.complete_days >= 7)
+                        try:
+                            parsed_d = datetime.strptime(d, "%Y-%m-%d").date()
+                            dates_set.add(parsed_d)
+                        except Exception:
+                            pass
+                            
+                if dates_set:
+                    sorted_dates = sorted(list(dates_set))
+                    self.window_start = str(sorted_dates[0])
+                    self.window_end = str(sorted_dates[-1])
+                    self.complete_days = len(sorted_dates)
+                    
+                    # Verify true consecutive day coverage
+                    consecutive = True
+                    for i in range(1, len(sorted_dates)):
+                        if (sorted_dates[i] - sorted_dates[i-1]).days != 1:
+                            consecutive = False
+                            break
+                    self.is_consecutive_window = consecutive and (self.complete_days >= 7)
+
+        expected_host = _extract_domain_from_url(self.expected_site_url) if self.expected_site_url else None
 
         if os.path.exists(pages_file):
             with open(pages_file, "r", encoding="utf-8", errors="ignore") as f:
@@ -72,26 +89,47 @@ class GSCDataIngestor:
                 for row in reader:
                     raw_url = row.get("Top pages", "").strip()
                     parsed = urlparse(raw_url)
+                    page_domain = _extract_domain_from_url(raw_url)
+                    
+                    # If expected site host is set, reject pages from foreign domains
+                    if expected_host and page_domain and page_domain != expected_host:
+                        continue
+                        
                     clean_path = parsed.path.rstrip("/") or "/"
+                    try:
+                        clicks = int(row.get("Clicks", 0) or 0)
+                        impr = int(row.get("Impressions", 0) or 0)
+                        ctr = float(str(row.get("CTR", "0%")).replace("%", "") or 0.0)
+                        pos = float(row.get("Position", 0.0) or 0.0)
+                    except Exception:
+                        continue
+                        
                     self.pages_data.append({
                         "url": raw_url,
                         "path": clean_path,
-                        "clicks": int(row.get("Clicks", 0) or 0),
-                        "impressions": int(row.get("Impressions", 0) or 0),
-                        "ctr": float(row.get("CTR", "0%").replace("%", "") or 0.0),
-                        "position": float(row.get("Position", 0.0) or 0.0)
+                        "clicks": clicks,
+                        "impressions": impr,
+                        "ctr": ctr,
+                        "position": pos
                     })
                     
         if os.path.exists(queries_file):
             with open(queries_file, "r", encoding="utf-8", errors="ignore") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
+                    try:
+                        q_clicks = int(row.get("Clicks", 0) or 0)
+                        q_impr = int(row.get("Impressions", 0) or 0)
+                        q_ctr = float(str(row.get("CTR", "0%")).replace("%", "") or 0.0)
+                        q_pos = float(row.get("Position", 0.0) or 0.0)
+                    except Exception:
+                        continue
                     self.queries_data.append({
                         "query": row.get("Top queries", "").strip(),
-                        "clicks": int(row.get("Clicks", 0) or 0),
-                        "impressions": int(row.get("Impressions", 0) or 0),
-                        "ctr": float(row.get("CTR", "0%").replace("%", "") or 0.0),
-                        "position": float(row.get("Position", 0.0) or 0.0)
+                        "clicks": q_clicks,
+                        "impressions": q_impr,
+                        "ctr": q_ctr,
+                        "position": q_pos
                     })
 
         if os.path.exists(countries_file):

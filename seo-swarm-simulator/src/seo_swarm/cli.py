@@ -13,6 +13,10 @@ import json
 import argparse
 from typing import Dict, Any, Optional
 
+# Ensure package root is importable when executed directly
+if __name__ == "__main__" and __package__ is None:
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from seo_swarm.store.database import init_db, store_run, store_evidence, store_evaluation, finalize_run
 from seo_swarm.roles.roster import ALL_62_ROLES, get_active_roles, TASK_ACTIVATION_PRESETS
 from seo_swarm.ingest.gsc_ingest import GSCDataIngestor

@@ -30,6 +30,7 @@ def normalize_route_path(file_path: str, root_dir: str, site_url: Optional[str] 
     # Remove file extension and index references for clean web route
     route = "/" + rel_path
     route = re.sub(r'/(?:index)?\.(?:html?|php|jsx?|tsx?|vue|astro)$', '', route, flags=re.IGNORECASE)
+    route = re.sub(r'\.(?:html?|php|jsx?|tsx?|vue|astro)$', '', route, flags=re.IGNORECASE)
     if not route:
         route = "/"
         

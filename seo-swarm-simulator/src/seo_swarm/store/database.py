@@ -1,8 +1,8 @@
 """
 Evidence Database & SQLite Store for SEO Swarm
 ===============================================
-Manages run-scoped evidence persistence, immutable evaluations, and execution manifests.
-Supports configurable DB paths with safe user-directory fallbacks for package installs.
+Manages run-scoped evidence persistence, immutable evaluations, execution manifests,
+and automated schema migrations from v1 legacy schemas.
 """
 
 import sqlite3
@@ -13,23 +13,19 @@ from typing import List, Dict, Any, Optional
 
 def get_default_db_path() -> str:
     """Resolves a writable database path with fallback to user home or temp directory."""
-    # 1. Environment variable override
     if os.environ.get("SEO_SWARM_DB_PATH"):
         return os.environ["SEO_SWARM_DB_PATH"]
         
-    # 2. Local repository data directory if writable
     repo_data = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "data"))
     if os.path.exists(repo_data) and os.access(repo_data, os.W_OK):
         return os.path.join(repo_data, "swarm.sqlite3")
         
-    # 3. User home directory fallback (~/.seo_swarm/swarm.sqlite3)
     user_home = os.path.expanduser("~")
     swarm_dir = os.path.join(user_home, ".seo_swarm")
     try:
         os.makedirs(swarm_dir, exist_ok=True)
         return os.path.join(swarm_dir, "swarm.sqlite3")
     except Exception:
-        # 4. Temp directory fallback
         return os.path.join(tempfile.gettempdir(), "seo_swarm.sqlite3")
 
 def init_db(db_path: Optional[str] = None) -> sqlite3.Connection:
@@ -43,7 +39,7 @@ def init_db(db_path: Optional[str] = None) -> sqlite3.Connection:
     conn.execute("PRAGMA foreign_keys = ON;")
     
     with conn:
-        # Runs table with execution metadata and completion summary
+        # Schema migration check for runs table
         conn.execute("""
         CREATE TABLE IF NOT EXISTS runs (
             run_id TEXT PRIMARY KEY,
@@ -58,22 +54,61 @@ def init_db(db_path: Optional[str] = None) -> sqlite3.Connection:
         );
         """)
         
-        # Evidence table scoped by run_id and evidence_key
-        conn.execute("""
-        CREATE TABLE IF NOT EXISTS evidence (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            run_id TEXT,
-            evidence_key TEXT,
-            category TEXT,
-            source_file TEXT,
-            line_range TEXT,
-            observed_fact TEXT,
-            raw_payload JSON,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (run_id) REFERENCES runs(run_id)
-        );
-        """)
-        
+        # Migrate runs table if old columns are missing
+        cur = conn.cursor()
+        cur.execute("PRAGMA table_info(runs);")
+        runs_cols = [row[1] for row in cur.fetchall()]
+        if "raw_score" not in runs_cols:
+            conn.execute("ALTER TABLE runs ADD COLUMN raw_score REAL;")
+        if "final_score" not in runs_cols:
+            conn.execute("ALTER TABLE runs ADD COLUMN final_score REAL;")
+        if "verdict" not in runs_cols:
+            conn.execute("ALTER TABLE runs ADD COLUMN verdict TEXT;")
+        if "summary" not in runs_cols:
+            conn.execute("ALTER TABLE runs ADD COLUMN summary JSON;")
+            
+        # Check evidence table migration
+        cur.execute("PRAGMA table_info(evidence);")
+        ev_cols = [row[1] for row in cur.fetchall()]
+        if not ev_cols:
+            # Table does not exist, create v2 schema
+            conn.execute("""
+            CREATE TABLE evidence (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_id TEXT,
+                evidence_key TEXT,
+                category TEXT,
+                source_file TEXT,
+                line_range TEXT,
+                observed_fact TEXT,
+                raw_payload JSON,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (run_id) REFERENCES runs(run_id)
+            );
+            """)
+        elif "evidence_key" not in ev_cols:
+            # Migrate legacy v1 evidence table to v2 schema with auto-increment ID
+            conn.execute("""
+            CREATE TABLE evidence_v2 (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_id TEXT,
+                evidence_key TEXT,
+                category TEXT,
+                source_file TEXT,
+                line_range TEXT,
+                observed_fact TEXT,
+                raw_payload JSON,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (run_id) REFERENCES runs(run_id)
+            );
+            """)
+            conn.execute("""
+            INSERT INTO evidence_v2 (run_id, evidence_key, category, source_file, line_range, observed_fact, raw_payload, created_at)
+            SELECT run_id, evidence_id, category, source_file, line_range, observed_fact, raw_payload, created_at FROM evidence;
+            """)
+            conn.execute("DROP TABLE evidence;")
+            conn.execute("ALTER TABLE evidence_v2 RENAME TO evidence;")
+            
         # Role evaluations table
         conn.execute("""
         CREATE TABLE IF NOT EXISTS role_evaluations (
