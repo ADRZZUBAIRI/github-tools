@@ -7,7 +7,8 @@ Implements non-negotiable hard caps based on real performance evidence:
 3. Authority Evidence Gate: Unverified authority caps at 30.0/100 without fabricating zero links.
 4. Suicidal National Target Gate: Unverified or DA < 10 domain targeting national KD 70+ terms capped at 15.0/100.
 5. Page Graveyard Trap: Page at position > 50 with 0 clicks capped at 25.0/100.
-6. Commercial Conversion Gate: Missing 1-tap phone action for mobile visitors capped at 30.0/100.
+6. Commercial Conversion Gate: Missing required conversion cues (e.g. 1-tap phone action for trades, checkout/demo for SaaS/ecom) capped at 30.0/100.
+7. Commercial Trust & Offer Gate: Missing required trust or ownership guarantees capped at 35.0/100.
 """
 
 from typing import Dict, List, Any, Optional
@@ -62,9 +63,9 @@ def apply_hard_reality_caps(
             
     # 4. AUTHORITY DATA GATE (UNKNOWN vs VERIFIED)
     auth_status = authority_data.get("status", "UNKNOWN")
-    if auth_status == "UNKNOWN":
+    if auth_status != "VERIFIED":
         hard_caps.append(30.0)
-        reasons.append("UNVERIFIED AUTHORITY GATE: No backlink dataset/API configured. Domain authority status is UNKNOWN. Score hard-capped at 30.0/100.")
+        reasons.append(f"UNVERIFIED AUTHORITY GATE: No verified backlink provider dataset configured ({authority_data.get('provider', 'none')}). Domain authority status is UNKNOWN. Score hard-capped at 30.0/100.")
     else:
         referring_domains = authority_data.get("referring_domains", 0)
         domain_authority = authority_data.get("domain_authority", 0)
@@ -73,10 +74,16 @@ def apply_hard_reality_caps(
             reasons.append(f"SUICIDAL NATIONAL COMPETITION GATE: DA {domain_authority} / {referring_domains} Ref Domains targeting national KD 70+ terms against VC-backed incumbents.")
             
     # 5. COMMERCIAL CONVERSION GATE
-    has_tap_to_call = commercial_data.get("has_tap_to_call", False)
+    has_tap_to_call = commercial_data.get("has_tap_to_call", True)
     if not has_tap_to_call:
         hard_caps.append(30.0)
-        reasons.append("COMMERCIAL ZERO-CONVERSION GATE: No 1-tap phone action for mobile visitors.")
+        reasons.append("COMMERCIAL ZERO-CONVERSION GATE: Missing required 1-tap phone action for mobile conversion.")
+        
+    # 6. COMMERCIAL TRUST / OWNERSHIP GATE
+    has_trust = commercial_data.get("has_ownership_guarantee", True)
+    if not has_trust:
+        hard_caps.append(35.0)
+        reasons.append("COMMERCIAL TRUST GATE: Required asset ownership or risk-reversal guarantee is missing from commercial offer.")
         
     final_score = min([raw_score] + hard_caps) if hard_caps else raw_score
     
