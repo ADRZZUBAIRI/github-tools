@@ -23,9 +23,10 @@ class WLR_Dispatcher {
         // Apply E.164 phone normalization if enabled
         if (!empty($settings['normalize_phone'])) {
             $default_country = !empty($settings['default_country']) ? $settings['default_country'] : 'US';
-            foreach (array('phone', 'telephone', 'mobile', 'cell', 'contact_number') as $phone_key) {
-                if (isset($lead_data[$phone_key])) {
-                    $lead_data[$phone_key] = WLR_Sanitizer::normalize_phone($lead_data[$phone_key], $default_country);
+            foreach ($lead_data as $k => $v) {
+                $lower = strtolower($k);
+                if (strpos($lower, 'phone') !== false || strpos($lower, 'mobile') !== false || strpos($lower, 'cell') !== false || strpos($lower, 'tel') !== false) {
+                    $lead_data[$k] = WLR_Sanitizer::normalize_phone($v, $default_country);
                 }
             }
         }
@@ -194,18 +195,20 @@ class WLR_Dispatcher {
     }
 
     private static function extract_lead_name($data) {
-        foreach (array('name', 'full_name', 'your_name', 'first_name', 'fname') as $k) {
-            if (!empty($data[$k])) {
-                return sanitize_text_field($data[$k]);
+        foreach ($data as $k => $v) {
+            $lower = strtolower($k);
+            if (strpos($lower, 'name') !== false && !empty($v) && is_string($v)) {
+                return sanitize_text_field($v);
             }
         }
         return 'Prospective Client';
     }
 
     private static function extract_lead_phone($data) {
-        foreach (array('phone', 'telephone', 'mobile', 'cell', 'phone_number') as $k) {
-            if (!empty($data[$k])) {
-                return sanitize_text_field($data[$k]);
+        foreach ($data as $k => $v) {
+            $lower = strtolower($k);
+            if ((strpos($lower, 'phone') !== false || strpos($lower, 'mobile') !== false || strpos($lower, 'cell') !== false || strpos($lower, 'tel') !== false) && !empty($v) && is_string($v)) {
+                return sanitize_text_field($v);
             }
         }
         return 'N/A';

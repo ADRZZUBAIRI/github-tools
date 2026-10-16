@@ -57,8 +57,8 @@ class WLR_Sanitizer {
             if (is_array($value)) {
                 $sanitized[$clean_key] = self::sanitize_payload($value);
             } else {
-                if (is_email($value)) {
-                    $sanitized[$clean_key] = sanitize_email($value);
+                if (function_exists('is_email') ? is_email($value) : filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    $sanitized[$clean_key] = function_exists('sanitize_email') ? sanitize_email($value) : filter_var($value, FILTER_SANITIZE_EMAIL);
                 } else {
                     $sanitized[$clean_key] = sanitize_text_field($value);
                 }
